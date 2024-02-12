@@ -1,0 +1,1 @@
+Launchpad is a hackathon project for Convex's 0-1 competition
