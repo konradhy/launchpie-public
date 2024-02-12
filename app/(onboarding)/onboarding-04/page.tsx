@@ -13,7 +13,7 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 
 import OnboardingHeader from "../onboarding-header";
-import OnboardingImage from "../onboarding-image";
+
 import OnboardingProgress from "../onboarding-progress";
 
 import { InfoCircledIcon } from "@radix-ui/react-icons";
