@@ -2,44 +2,54 @@
 import {
   ChevronsLeft,
   MenuIcon,
-  PlusCircle,
-  Search,
-  Settings,
   Home,
-  Percent,
-  FileUp,
+  ClipboardList,
+  Folder,
+  NotebookPen,
+  UploadCloud,
+  Bot,
+  Plus,
+  PenLine,
+  GripVertical,
+  HandCoins,
+  LucideIcon,
+  Settings,
 } from "lucide-react";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { ElementRef, useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
 import { useMutation, useQuery } from "convex/react";
-
 import { cn } from "@/lib/utils";
 import { api } from "@/convex/_generated/api";
-
-import { UserItem } from "./user-item";
-import { Item } from "./item";
-
-import { toast } from "sonner";
-
-
 import { useFileUpload } from "@/hooks/use-file-upload";
 import { useNewTask } from "@/hooks/use-new-task";
-
+import { useSearch } from "@/hooks/use-search";
+import { AccountSwitcher } from "./account-switcher";
+import { Separator } from "@/components/ui/separator";
+import { Nav } from "./nav";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { useSettings } from "@/hooks/use-settings";
+interface NavLink {
+  title: string;
+  label?: string;
+  icon: LucideIcon;
+  variant: "default" | "ghost";
+  onClick?: () => void;
+  link?: string;
+  hotkey?: string;
+}
 
 export const Navigation = () => {
   //hooks
   const pathname = usePathname(); //to collapse sidebar when we navigate to a new document
   const params = useParams();
   const isMobile = useMediaQuery("(max-width: 768px)");
-
   const company = useQuery(api.companies.getByUserId);
-
-
   const fileUpload = useFileUpload();
   const newTask = useNewTask();
-
+  const search = useSearch();
   const router = useRouter();
+  const settings = useSettings();
 
   //refs
   const isResizingRef = useRef(false);
@@ -47,6 +57,7 @@ export const Navigation = () => {
   const navbarRef = useRef<ElementRef<"div">>(null);
   const [isResetting, setIsResetting] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(isMobile);
+  const [isIconised, setIsIconised] = useState(false);
 
   useEffect(() => {
     if (isMobile) {
@@ -78,7 +89,7 @@ export const Navigation = () => {
     if (!isResizingRef.current) return;
     let newWidth = event.clientX;
 
-    if (newWidth < 240) newWidth = 240;
+    if (newWidth < 100) newWidth = 100;
     if (newWidth > 480) newWidth = 480;
 
     if (sidebarRef.current && navbarRef.current) {
@@ -88,6 +99,12 @@ export const Navigation = () => {
         "width",
         `calc(100% - ${newWidth}px)`,
       );
+    }
+
+    if (newWidth < 160) {
+      setIsIconised(true);
+    } else {
+      setIsIconised(false);
     }
   };
 
@@ -124,18 +141,93 @@ export const Navigation = () => {
     }
   };
 
-  
+  let topLinks: NavLink[] = [
+    {
+      title: "Home",
+      icon: Home,
+      variant: "default",
+      link: "/dashboard",
+    },
+    // "Stakes" link will be conditionally added
+    {
+      title: "Dollops",
+      label: "85",
+      icon: HandCoins,
+      variant: "ghost",
+    },
+    {
+      title: "Files",
+      label: "23",
+      icon: Folder,
+      variant: "ghost",
+      onClick: search.onOpen,
+    },
+    {
+      title: "Notes",
+      label: "43",
+      icon: NotebookPen,
+      variant: "ghost",
+      link: "/notes",
+    },
+  ];
 
-  const onNavigate = (url: string) => {
-    return router.push(url);
-  };
+  if (company && company._id) {
+    topLinks.splice(1, 0, {
+      title: "Stakes",
+      label: "85",
+      icon: ClipboardList,
+      variant: "ghost",
+      link: "/stakes",
+    });
+  }
+
+  let middleLinks: NavLink[] = [
+    {
+      title: "Upload File",
+      icon: UploadCloud,
+
+      variant: "ghost",
+      onClick: fileUpload.onOpen,
+    },
+    {
+      title: "Ai Chat",
+      icon: Bot,
+      variant: "ghost",
+    },
+
+    {
+      title: "New Note",
+      icon: PenLine,
+      variant: "ghost",
+    },
+  ];
+
+  if (company && company._id) {
+    middleLinks.splice(1, 0, {
+      title: "New Stake",
+      icon: Plus,
+      hotkey: "S",
+      variant: "ghost",
+
+      onClick: () => newTask.onOpen(company._id),
+    });
+  }
+
+  let bottomLinks: NavLink[] = [
+    {
+      title: "Settings",
+      icon: Settings,
+      variant: "ghost",
+      onClick: settings.onOpen,
+    },
+  ];
 
   return (
     <>
       <aside
         ref={sidebarRef}
         className={cn(
-          "group/sidebar h-full bg-indigo-100 overflow-y-auto relative flex w-60 flex-col z-[99999]",
+          "group/sidebar h-full  overflow-y-auto relative flex w-60 flex-col z-[99999]",
           isResetting && "transition-all ease-in-out duration-300",
           isMobile && "w-0",
         )}
@@ -150,34 +242,52 @@ export const Navigation = () => {
         >
           <ChevronsLeft className="h-6 w-6" />
         </div>
-        <div className="mt-4">
-          <UserItem />
-          <Item
-            label="Home"
-            onClick={() => onNavigate("/dashboard")}
-            icon={Home}
-          />
-          {company && company._id && (
-            <Item
-              label="New Task"
-              onClick={() => newTask.onOpen(company._id)}
-              icon={PlusCircle}
-            />
-          )}
-       
-          <Item label="Uploads" onClick={fileUpload.onOpen} icon={FileUp} />
 
-          <Item label="Discounts" onClick={fileUpload.onOpen} icon={Percent} />
+        <nav className="mt-4 ">
+          <TooltipProvider>
+            <div
+              className={cn(
+                "flex h-[52px] items-center justify-center ",
+                isIconised ? "h-[52px]" : "px-2",
+              )}
+            >
+              <AccountSwitcher
+                isIconised={isIconised}
+                accounts={[
+                  {
+                    label: "Parent Company",
+                    email: "Primary",
+                    icon: <Home />,
+                  },
+                  {
+                    label: "Coming Soon",
+                    email: "Subsidiary Companies coming soon",
+                    icon: <Home />,
+                  },
+                ]}
+              />
+            </div>
 
-          <Item label="Settings" onClick={fileUpload.onOpen} icon={Settings} />
-        </div>
+            <Nav isCollapsed={isIconised} links={topLinks} />
+            <Separator />
+            <Nav isCollapsed={isIconised} links={middleLinks} />
+            <Separator />
+            <Nav isCollapsed={isIconised} links={bottomLinks} />
+          </TooltipProvider>
+        </nav>
 
         <div
+          className="flex flex-row-reverse"
           onMouseDown={handleMouseDown}
           onClick={resetWidth}
-          className="opacity-0 group-hover/sidebar:opacity-100 transition cursor-ew-resize absolute h-full w-1 bg-primary/10 right-0 top-0"
-        />
+        >
+          <div className="opacity-30 group-hover/sidebar:opacity-100 transition cursor-ew-resize absolute h-full w-1 right-0 top-0">
+            <div className=" group-hover/sidebar:opacity-100 transition cursor-ew-resize absolute h-full w-[1px] bg-primary/40 right-0 top-0 " />
+          </div>
+          <GripVertical className="h-6 w-6 group-hover/sidebar transition cursor-ew-resize  -translate-y-[20rem] h-xs:-translate-y-[13rem] h-sm:-translate-y-[7rem] h-md:-translate-y-[8rem] " />
+        </div>
       </aside>
+
       <div
         ref={navbarRef}
         className={cn(
@@ -187,15 +297,14 @@ export const Navigation = () => {
         )}
       >
         <nav className="bg-transparent px-3 py-2 w-full">
-            {isCollapsed && (
-              <MenuIcon
-                onClick={resetWidth}
-                role="button"
-                className="h-6 w-6 text-muted-foreground"
-              />
-            )}
-          </nav>
-        
+          {isCollapsed && (
+            <MenuIcon
+              onClick={resetWidth}
+              role="button"
+              className="h-6 w-6 text-muted-foreground"
+            />
+          )}
+        </nav>
       </div>
     </>
   );

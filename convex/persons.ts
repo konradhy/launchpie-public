@@ -11,7 +11,6 @@ export const create = mutation({
     phoneNumber: v.string(),
     email: v.string(),
     hourlyRate: v.number(),
-   
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -24,9 +23,9 @@ export const create = mutation({
 
     const person = await ctx.db.insert("persons", {
       firstName: args.firstName,
-        lastName: args.lastName,
-        hourlyRate: 1,
-    role: "default",
+      lastName: args.lastName,
+      hourlyRate: 1,
+      role: "default",
       dob: args.dob,
       address: args.address,
       phoneNumber: args.phoneNumber,
@@ -42,13 +41,13 @@ export const createMultiple = mutation({
   args: {
     persons: v.array(
       v.object({
-          firstName: v.string(),
-    lastName: v.string(),
-    dob: v.string(),
-    address: v.string(),
-    phoneNumber: v.string(),
-    email: v.string(),
-    hourlyRate: v.number(),
+        firstName: v.string(),
+        lastName: v.string(),
+        dob: v.string(),
+        address: v.string(),
+        phoneNumber: v.string(),
+        email: v.string(),
+        hourlyRate: v.number(),
       }),
     ),
   },
@@ -63,16 +62,16 @@ export const createMultiple = mutation({
     await Promise.all(
       args.persons.map(async (person) => {
         const id = await ctx.db.insert("persons", {
-       firstName: person.firstName,
-        lastName: person.lastName,
-        hourlyRate: 20,
-    role: "default",
-      dob: person.dob,
-      address: person.address,
-      phoneNumber: person.phoneNumber,
-      updatedAt: new Date().toISOString(),
-      userId: identity.subject,
-      email: person.email,
+          firstName: person.firstName,
+          lastName: person.lastName,
+          hourlyRate: 20,
+          role: "default",
+          dob: person.dob,
+          address: person.address,
+          phoneNumber: person.phoneNumber,
+          updatedAt: new Date().toISOString(),
+          userId: identity.subject,
+          email: person.email,
         });
 
         ids.push(id);
@@ -97,10 +96,8 @@ export const getPersonsByIds = query({
       throw new ConvexError({
         message: "You must be logged in to get person details.",
         severity: "low",
-      
       });
     }
-
 
     const details = await getAll(ctx.db, args.personIds);
 
@@ -114,10 +111,8 @@ export const getPersonNamesByGroupedIds = query({
     // Process each group of person IDs to fetch their details and extract names
     const namesGroups = await Promise.all(
       args.personGroups.map(async (group) => {
-    
         const details = await getAll(ctx.db, group);
 
-    
         return details.map((person) => person?.firstName);
       }),
     );
@@ -130,7 +125,8 @@ export const getPersonNamesByGroupedIds = query({
 export const update = mutation({
   args: {
     personId: v.id("persons"),
-    name: v.optional(v.string()),
+    firstName: v.optional(v.string()),
+    lastName: v.optional(v.string()),
     dob: v.optional(v.string()),
     address: v.optional(v.string()),
     phoneNumber: v.optional(v.string()),
@@ -139,19 +135,18 @@ export const update = mutation({
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
-        throw new ConvexError({
-            message: "You must be logged in to update a person.",
-            severity: "low",
-        });
+      throw new ConvexError({
+        message: "You must be logged in to update a person.",
+        severity: "low",
+      });
     }
     const { personId, ...rest } = args;
     const existingPerson = await ctx.db.get(args.personId);
     if (!existingPerson) {
-        throw new ConvexError({
-            message: "We couldn't find the person you are looking for.",
-            severity: "low",
-        });
-    
+      throw new ConvexError({
+        message: "We couldn't find the person you are looking for.",
+        severity: "low",
+      });
     }
 
     const person = await ctx.db.patch(args.personId, {
@@ -169,10 +164,10 @@ export const getShareholdersByCompanyId = query({
     const identity = await ctx.auth.getUserIdentity();
 
     if (!identity) {
-        throw new ConvexError({
-            message: "You must be logged in to get shareholder details.",
-            severity: "low",
-        });
+      throw new ConvexError({
+        message: "You must be logged in to get shareholder details.",
+        severity: "low",
+      });
     }
 
     const company = await ctx.db.get(args.companyId);

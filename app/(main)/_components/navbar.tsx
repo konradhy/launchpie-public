@@ -1,4 +1,4 @@
-//this should be ssr.
+"use client";
 import * as React from "react";
 import {
 
@@ -53,7 +53,7 @@ interface MailProps {
 export function Mail({
   accounts,
 
-  defaultLayout = [265, 440, 655],
+  defaultLayout = [290, 480, 755],
   defaultCollapsed = false,
   navCollapsedSize,
 }: MailProps) {

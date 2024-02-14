@@ -1,24 +1,27 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { LucideIcon } from "lucide-react"
+import Link from "next/link";
+import { LucideIcon } from "lucide-react";
 
-import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@/components/ui/tooltip"
+} from "@/components/ui/tooltip";
 
 interface NavProps {
-  isCollapsed: boolean
+  isCollapsed: boolean;
   links: {
-    title: string
-    label?: string
-    icon: LucideIcon
-    variant: "default" | "ghost"
-  }[]
+    title: string;
+    label?: string;
+    icon: LucideIcon;
+    variant: "default" | "ghost";
+    onClick?: () => void;
+    hotkey?: string;
+    link?: string;
+  }[];
 }
 
 export function Nav({ links, isCollapsed }: NavProps) {
@@ -33,7 +36,8 @@ export function Nav({ links, isCollapsed }: NavProps) {
             <Tooltip key={index} delayDuration={0}>
               <TooltipTrigger asChild>
                 <Link
-                  href="#"
+                  onClick={() => link.onClick && link.onClick()}
+                  href={link.link || "#"}
                   className={cn(
                     buttonVariants({ variant: link.variant, size: "icon" }),
                     "h-9 w-9",
@@ -45,7 +49,11 @@ export function Nav({ links, isCollapsed }: NavProps) {
                   <span className="sr-only">{link.title}</span>
                 </Link>
               </TooltipTrigger>
-              <TooltipContent side="right" className="flex items-center gap-4">
+              <TooltipContent
+                side="right"
+                className="flex items-center gap-4"
+                onClick={() => link.onClick && link.onClick()}
+              >
                 {link.title}
                 {link.label && (
                   <span className="ml-auto text-muted-foreground">
@@ -56,8 +64,9 @@ export function Nav({ links, isCollapsed }: NavProps) {
             </Tooltip>
           ) : (
             <Link
+              onClick={() => link.onClick && link.onClick()}
               key={index}
-              href="#"
+                  href={link.link || "#"}
               className={cn(
                 buttonVariants({ variant: link.variant, size: "sm" }),
                 link.variant === "default" &&
@@ -67,6 +76,11 @@ export function Nav({ links, isCollapsed }: NavProps) {
             >
               <link.icon className="mr-2 h-4 w-4" />
               {link.title}
+              {link.hotkey && (
+                <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+                  <span className="text-xs">⌘</span>{link.hotkey}
+                </kbd>
+              )}
               {link.label && (
                 <span
                   className={cn(
@@ -83,5 +97,5 @@ export function Nav({ links, isCollapsed }: NavProps) {
         )}
       </nav>
     </div>
-  )
+  );
 }

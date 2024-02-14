@@ -2,7 +2,7 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
-    companies: defineTable({
+  companies: defineTable({
     companyName: v.string(),
     email: v.string(),
     address: v.string(),
@@ -50,7 +50,7 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_companyName", ["companyName"]),
 
-    persons: defineTable({
+  persons: defineTable({
     firstName: v.string(),
     lastName: v.string(),
     dob: v.string(),
@@ -62,12 +62,14 @@ export default defineSchema({
     linkedUserId: v.optional(v.string()),
     hourlyRate: v.number(),
     role: v.string(),
+    profilePicture: v.optional(v.string()),
+    companyId: v.optional(v.id("companies")), //made mandatory later
   })
     .index("by_user", ["userId"])
     .index("by_linkedUserId", ["linkedUserId"]),
-    
-    tasks: defineTable({
-    title: v.optional(v.string()), 
+
+  tasks: defineTable({
+    title: v.optional(v.string()),
     description: v.string(),
     assignees: v.array(v.string()),
     dueDate: v.string(),
@@ -98,6 +100,4 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_company", ["companyId"])
     .index("by_assignee", ["assignees"]), //not sure if this works with an array
-
-
-})
+});
