@@ -18,6 +18,7 @@ import {
 import { useSearch } from "@/hooks/use-search";
 import { api } from "@/convex/_generated/api";
 import { on } from "events";
+import { Id } from "@/convex/_generated/dataModel";
 
 export const SearchCommand = () => {
   const { user } = useUser();
@@ -25,11 +26,11 @@ export const SearchCommand = () => {
   //const documents = useQuery(api.documents.getSearch);
   const files = useQuery(api.files.getSearch);
   const archiveFile = useMutation(api.files.archive);
-  const [isStorageId, setIsStorageId] = useState("");
+  const [isDocumentId, setIsDocumentId] = useState<Id<"documents">>();
 
   const serveFile = useQuery(
     api.files.serveFile,
-    isStorageId !== "" ? { storageId: isStorageId } : "skip",
+    isDocumentId !== undefined ? { id: isDocumentId } : "skip",
   );
   const [isMounted, setIsMounted] = useState(false);
 
@@ -58,20 +59,20 @@ export const SearchCommand = () => {
     onClose();
   };
 
-  const onDelete = (storageId: string) => {
-    archiveFile({ storageId });
+  const onDelete = (id: Id<"documents">) => {
+    archiveFile({ id });
   };
 
-  const onSelectFile = (id: string) => {
-    setIsStorageId(id);
+  const onSelectFile = (id: Id<"documents">) => {
+    setIsDocumentId(id);
   };
 
   useEffect(() => {
-    if (isStorageId !== "" && serveFile !== undefined && serveFile !== null) {
+    if (isDocumentId !== "" && serveFile !== undefined && serveFile !== null) {
       window.open(serveFile, "_blank");
       onClose();
     }
-  }, [isStorageId, serveFile, router, onClose]);
+  }, [isDocumentId, serveFile, router, onClose]);
 
   if (!isMounted) {
     return null;
@@ -99,29 +100,27 @@ export const SearchCommand = () => {
             </CommandItem>
           ))}
         </CommandGroup> */}
-     
+
         <CommandGroup heading="Uploaded Files">
           {files?.map((document) => (
             <CommandItem
-              key={document.storageId}
-              value={`${document.storageId}-${document.fileName}`}
+              key={document._id}
+              value={`${document._id}-${document.fileName}`}
               title={document.fileName}
               className="flex justify-between"
             >
               <span
-                onClick={() => onSelectFile(document.storageId)}
+                onClick={() => onSelectFile(document._id)}
                 className="truncate"
               >
                 {document.fileName}
               </span>
               <div>
                 <Trash
-                  onClick={() => onDelete(document.storageId)}
+                  onClick={() => onDelete(document._id)}
                   className=" h-2 w-2 hover:text-red-500"
                 />
               </div>
-      
-         
             </CommandItem>
           ))}
         </CommandGroup>

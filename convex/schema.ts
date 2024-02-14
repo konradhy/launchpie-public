@@ -100,4 +100,44 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_company", ["companyId"])
     .index("by_assignee", ["assignees"]), //not sure if this works with an array
+
+  messages: defineTable({
+    isViewer: v.boolean(),
+    sessionId: v.string(),
+    text: v.string(),
+  }).index("bySessionId", ["sessionId"]),
+
+  documents: defineTable({
+    url: v.optional(v.string()),
+    text: v.optional(v.string()),
+    storageId: v.string(),
+    fileName: v.string(),
+    userId: v.string(),
+    createdAt: v.string(),
+    updatedAt: v.string(),
+    isArchived: v.boolean(),
+    isPublished: v.boolean(),
+    companyId: v.id("companies"),
+  })
+    .index("byUrl", ["url"])
+    .index("byCompanyId", ["companyId"]),
+
+  chunks: defineTable({
+    documentId: v.id("documents"),
+    text: v.string(),
+    embeddingId: v.union(v.id("embeddings"), v.null()),
+  })
+    .index("byDocumentId", ["documentId"])
+    .index("byEmbeddingId", ["embeddingId"]),
+
+  // the actual embeddings
+  embeddings: defineTable({
+    embedding: v.array(v.number()),
+    chunkId: v.id("chunks"),
+  })
+    .index("byChunkId", ["chunkId"])
+    .vectorIndex("byEmbedding", {
+      vectorField: "embedding",
+      dimensions: 1536,
+    }),
 });

@@ -1,3 +1,4 @@
+//extract navlinks and related business logic into their own container
 "use client";
 import {
   ChevronsLeft,
