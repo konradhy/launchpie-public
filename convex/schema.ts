@@ -71,7 +71,7 @@ export default defineSchema({
   tasks: defineTable({
     title: v.optional(v.string()),
     description: v.string(),
-    assignees: v.array(v.string()),
+    assignees: v.array(v.string()), //this should be an array of personIds
     dueDate: v.string(),
     estimatedTime: v.number(),
     actualTime: v.optional(v.number()),
@@ -100,6 +100,24 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_company", ["companyId"])
     .index("by_assignee", ["assignees"]), //not sure if this works with an array
+
+  notes: defineTable({
+    title: v.string(),
+    userId: v.string(),
+    isArchived: v.boolean(),
+    parentNote: v.optional(v.id("notes")),
+    content: v.optional(v.string()),
+    coverImage: v.optional(v.string()),
+    icon: v.optional(v.string()),
+    isPublished: v.boolean(),
+    editors: v.optional(v.array(v.string())),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_parent", ["userId", "parentNote"])
+    .searchIndex("search_content", {
+      searchField: "content",
+      filterFields: ["userId", "isArchived", "isPublished"],
+    }),
 
   messages: defineTable({
     isViewer: v.boolean(),

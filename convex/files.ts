@@ -1,8 +1,14 @@
 //After we refactor the code base so that launchpad lives alone we can leverage how we used to use Documents and just take their trash page. From there we'll be able to perma delete files and restore them
 //refactor so that files are stored in a different table
 import { ConvexError, v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { internalMutation, mutation, query } from "./_generated/server";
 import { Id } from "./_generated/dataModel";
+import { internal } from "./_generated/api";
+import { asyncMap } from "modern-async";
+import {
+  RecursiveCharacterTextSplitter,
+  CharacterTextSplitter,
+} from "langchain/text_splitter";
 
 export const generateUploadUrl = mutation({
   handler: async (ctx) => {
@@ -15,6 +21,8 @@ export const generateUploadUrl = mutation({
   },
 });
 
+//rename to save file
+//update to switch from storageID being a string to it being the proper id type
 export const saveStorageIds = mutation({
   args: {
     uploaded: v.array(
@@ -68,21 +76,25 @@ export const saveStorageIds = mutation({
       ),
     );
 
-    const files = existingCompany.files || [];
-    const newFiles = files.concat(
-      args.uploaded.map((upload) => ({
-        storageId: upload.storageId,
-        userId: identity.subject,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        fileName: upload.fileName,
-        isArchived: false,
-        isPublished: false,
-      })),
-    );
+    const storageId = args.uploaded[0].storageId;
+    //manual hack was used here for typing fix properly later
+    const fileUrl = await ctx.storage.getUrl(storageId as Id<"_storage">);
+    if (!fileUrl) {
+      throw new ConvexError({
+        message: "File not found",
+        severity: "low",
+      });
+    }
 
-    ctx.db.patch(args.companyId, {
-      files: newFiles,
+    //call internal action, passing the files one at a time
+    await ctx.scheduler.runAfter(0, internal.ingest.extract.extractText, {
+      fileUrl: fileUrl,
+      id: fileIds[0],
+      author: identity.name || "",
+      summary: "",
+      title: args.uploaded[0].fileName,
+      uploadedAt: new Date().toISOString(),
+      category: "document",
     });
   },
 });
@@ -235,5 +247,72 @@ export const serveFile = query({
 
     //generate the file url
     return url;
+  },
+});
+
+export const chunker = internalMutation({
+  args: {
+    text: v.string(),
+    args: v.object({
+      fileUrl: v.string(),
+      id: v.id("documents"),
+      author: v.string(),
+      summary: v.string(),
+      title: v.string(),
+      uploadedAt: v.string(),
+      category: v.string(),
+    }),
+  },
+  handler: async (ctx, { text, args }) => {
+    const splitter = new CharacterTextSplitter({
+      chunkSize: 1536,
+      chunkOverlap: 200,
+    });
+
+    const chunks = await splitter.createDocuments(
+      [text],
+      [
+        {
+          summary: args.summary,
+          title: args.title,
+          author: args.author,
+          uploadedAt: args.uploadedAt,
+          id: args.id,
+          category: args.category,
+        },
+      ],
+
+      {
+        chunkHeader: `Document Title: ${args.title}  \n`,
+        appendChunkOverlapHeader: true,
+      },
+    );
+
+    await asyncMap(chunks, async (chunk: any) => {
+      const chunkText = JSON.stringify(chunk);
+      await ctx.db.insert("chunks", {
+        documentId: args.id,
+        text: chunkText,
+        embeddingId: null,
+      });
+    });
+  },
+});
+
+export const saveChunks = internalMutation({
+  args: {
+    chunks: v.string(),
+    id: v.id("documents"),
+  },
+  handler: async (ctx, { chunks, id }) => {
+    console.log("chunks", chunks);
+    await asyncMap(chunks, async (chunk: any) => {
+      console.log("chunk", chunk);
+      // await ctx.db.insert("chunks", {
+      //   documentId: id,
+      //   text: chunk ,
+      //   embeddingId: null,
+      // });
+    });
   },
 });

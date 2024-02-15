@@ -8,7 +8,10 @@ To do
 
 
 */
-import { Metadata } from "next";
+"use client";
+
+// import { Metadata } from "next";
+import axios from "axios";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -18,11 +21,12 @@ import EquityCard from "./_components/equity-card";
 import { appName } from "@/lib/utils";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import CompanyDetailsCard from "./_components/_company-details/company-details";
+import { ConvexAiChat } from "@/components/aiChat";
 
-export const metadata: Metadata = {
-  title: `${appName} | Dashboard`,
-  description: `${appName} brings a fresh approach to fair equity distribution and management.`,
-};
+// export const metadata: Metadata = {
+//   title: `${appName} | Dashboard`,
+//   description: `${appName} brings a fresh approach to fair equity distribution and management.`,
+// };
 
 export default function DashboardPage() {
   const equityData = [
@@ -81,6 +85,7 @@ export default function DashboardPage() {
       tasks: ["Marketing", "Sales"],
     },
   ];
+
   return (
     <>
       <div className=" flex-col md:flex   ">
@@ -117,6 +122,15 @@ export default function DashboardPage() {
               </div>
 
               <RecentSales />
+              <ConvexAiChat
+                convexUrl={"https://judicious-corgi-741.convex.cloud"}
+                name="QuityAI "
+                infoMessage="I will look at your uploaded files, notes, and stakes to provide the best answer for your questions."
+                welcomeMessage="Hey there, what can I help you with?"
+                renderTrigger={(onClick) => (
+                  <Button onClick={onClick}>Open AI chat</Button>
+                )}
+              />
             </div>
           </div>
         </div>
