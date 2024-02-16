@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 const TaskCard = ({ title, dueDate, reviewStatus, badgeColor }) => (
-  <div className="p-4 bg-primary/5 rounded-lg shadow-md flex items-center justify-between cursor-pointer hover:bg-primary/10">
+  <div className="p-4 bg-primary/5 rounded-lg shadow-md flex items-center justify-between cursor-pointer hover:bg-primary/10 dark:bg-slate-800">
     <Avatar>
       <AvatarImage src="/placeholder-avatar.png" />
       <AvatarFallback>U</AvatarFallback>
@@ -87,7 +87,7 @@ export default function Component() {
 
   return (
     <div className="w-full max-w-3xl mx-auto col-span-3">
-      <Card className="overflow-y-auto bg-gray-50 rounded-lg shadow-inner">
+      <Card className="overflow-y-auto bg-gray-50 rounded-lg shadow-inner dark:bg-background">
         <CardHeader>
           <CardTitle>Current Stakes</CardTitle>
           <CardDescription>Stakes that need to be completed </CardDescription>

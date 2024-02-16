@@ -17,21 +17,27 @@ export const InfoSection = ({ title, description, details }) => {
     <Sheet>
       <SheetTrigger asChild>
         <div className="mb-4 cursor-pointer">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 dark:text-slate-200">
             {title} <span className="text-indigo-400">(view)</span>
           </p>
-          <p className="font-medium text-gray-700">{details.length}</p>
+          <p className="font-medium text-gray-700 dark:text-slate-400">
+            {details.length}
+          </p>
         </div>
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
           <SheetTitle>{title}</SheetTitle>
-          <SheetDescription>{description}</SheetDescription>
+          <SheetDescription>
+            {description}
+            <p className="text-xs text-primary">click name to edit</p>
+          </SheetDescription>
         </SheetHeader>
-        <div className="space-y-4 p-6">
+        <div className="space-y-4 p-6 ">
           {details.map((detail, index) => (
             <PersonDetail key={detail?._id} detail={detail} index={index} />
           ))}
+
           <Separator />
           <SheetFooter className="flex justify-end mt-4">
             <SheetClose asChild>

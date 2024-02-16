@@ -12,7 +12,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 const TaskCard = ({ task, detail }) => {
   return (
-    <div className="bg-primary/10 p-2 rounded-lg mb-2 last:mb-0 shadow-inner hover:bg-primary/20 cursor-pointer">
+    <div className="bg-primary/10 p-2 rounded-lg mb-2 last:mb-0 shadow-inner hover:bg-primary/20 cursor-pointer dark:bg-gray-800">
       <p className="text-sm font-semibold truncate">{task}</p>
       <p className="text-xs text-gray-500 truncate">{detail}</p>
     </div>
@@ -39,10 +39,10 @@ const EquityCard = ({
   ],
 }) => {
   return (
-    <Card className=" shadow rounded-lg overflow-hidden min-w-[350px] bg-background">
-      <CardHeader className="px-4 py-2 bg-slate-50">
+    <Card className=" shadow rounded-lg overflow-hidden min-w-[350px] bg-background ">
+      <CardHeader className="px-4 py-2 bg-slate-50 dark:bg-slate-800">
         <div className="flex justify-between items-center">
-          <span className="text-xs font-medium text-gray-500 truncate">
+          <span className="text-xs font-medium text-gray-500 dark:text-gray-100 truncate">
             Equity: <span>{totalEquity}</span>
           </span>
           <span className="text-xs text-gray-400">{shareholderName}</span>

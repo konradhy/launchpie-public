@@ -16,10 +16,10 @@ export const PersonDetail = ({ detail, index }) => {
   // You can adapt this part based on the specific needs of shareholders and directors
 
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between ">
       <Dialog>
         <DialogTrigger asChild>
-          <span className="flex-grow mr-4 text-indigo-600 hover:text-indigo-800 cursor-pointer">
+          <span className="flex-grow mr-4  hover:text-primary cursor-pointer">
             {detail?.firstName}
           </span>
         </DialogTrigger>

@@ -9,9 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@blocknote/core": "^0.9.4",
+    "@blocknote/react": "^0.9.4",
     "@clerk/clerk-react": "^4.30.5",
     "@cyntler/react-doc-viewer": "^1.14.1",
     "@hookform/resolvers": "^3.3.4",
+    "@nanostores/react": "github:ai/react",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-avatar": "^1.0.4",
     "@radix-ui/react-checkbox": "^1.0.4",
@@ -30,6 +33,7 @@
     "@radix-ui/react-tooltip": "^1.0.7",
     "@tanstack/react-table": "^8.11.8",
     "@xixixao/uploadstuff": "^0.0.5",
+    "ai": "^2.2.35",
     "axios": "^1.6.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
@@ -37,6 +41,7 @@
     "convex": "^1.9.0",
     "convex-helpers": "^0.1.15",
     "docx": "^8.5.0",
+    "emoji-picker-react": "^4.7.17",
     "langchain": "^0.1.18",
     "lucide-react": "^0.324.0",
     "mammoth": "^1.6.0",

@@ -30,6 +30,8 @@ import { Separator } from "@/components/ui/separator";
 import { Nav } from "./nav";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useSettings } from "@/hooks/use-settings";
+import { ConvexAiChat } from "@/components/aiChat";
+import { Button } from "@/components/ui/button";
 interface NavLink {
   title: string;
   label?: string;
@@ -274,6 +276,21 @@ export const Navigation = () => {
             <Nav isCollapsed={isIconised} links={middleLinks} />
             <Separator />
             <Nav isCollapsed={isIconised} links={bottomLinks} />
+
+            <ConvexAiChat
+              convexUrl={"https://judicious-corgi-741.convex.cloud"}
+              name="QuityAI "
+              infoMessage="I will look at your uploaded files, notes, and stakes to provide the best answer for your questions."
+              welcomeMessage="Hey there, what can I help you with?"
+              renderTrigger={(onClick) => (
+                <div
+                  className="flex items-center justify-center h-12 w-full  text-primary rounded-md cursor-pointer hover:bg-primary-dark transition-all"
+                  onClick={onClick}
+                >
+                  Ask QuityAi <Bot className="h-6 w-6 ml-2" />
+                </div>
+              )}
+            />
           </TooltipProvider>
         </nav>
 

@@ -22,6 +22,8 @@ import {
 import { Detail } from "./detail";
 import { InfoSection } from "./info-section";
 import { usePersonsDetails } from "@/hooks/use-persons-details";
+import { ConvexAiChat } from "@/components/aiChat";
+import { Button } from "@/components/ui/button";
 
 const CompanyDetailsCard = () => {
   const companyDetails = useQuery(api.companies.getByUserId);
@@ -47,10 +49,10 @@ const CompanyDetailsCard = () => {
   }
 
   return (
-    <Card className="overflow-y-auto bg-primary/5 rounded-lg shadow-inner">
+    <Card className="overflow-y-auto bg-primary/5 rounded-lg shadow-inner dark:bg-slate-800">
       <CardHeader className="flex-row justify-between items-center  ">
         <div>
-          <CardTitle className="">
+          <CardTitle className="dark:text-slate-100">
             {companyDetails?.companyName || "loading..."}
           </CardTitle>
           <CardDescription>Key details about your company</CardDescription>
@@ -58,11 +60,11 @@ const CompanyDetailsCard = () => {
 
         <FileEdit
           type="button"
-          className="mr-2 hover:text-slate-600 600 ml-auto cursor-pointer"
+          className="mr-2 hover:text-slate-600 600 ml-auto cursor-pointer "
         />
       </CardHeader>
 
-      <CardContent className="grid grid-cols-2 gap-4 p-6 bg-background shadow">
+      <CardContent className="grid grid-cols-2 gap-4 p-6 bg-background  shadow">
         {/* Left column for general details */}
         <div>
           <Detail label="Name" value={companyName} />

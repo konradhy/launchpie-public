@@ -24,6 +24,7 @@ import type * as notes from "../notes.js";
 import type * as persons from "../persons.js";
 import type * as serve from "../serve.js";
 import type * as tasks from "../tasks.js";
+import type * as users from "../users.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -44,6 +45,7 @@ declare const fullApi: ApiFromModules<{
   persons: typeof persons;
   serve: typeof serve;
   tasks: typeof tasks;
+  users: typeof users;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,

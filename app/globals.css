@@ -49,6 +49,8 @@
   }
 }
 
+/* Base theme adjustments for BlockNote */
+
 @layer base {
   * {
     @apply border-border;

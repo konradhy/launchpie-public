@@ -1,0 +1,11 @@
+.bn-container[data-color-scheme="light"] {
+  --bn-colors-editor-background: #003366; /* Dark blue for light mode */
+}
+
+.bn-container[data-color-scheme="dark"] {
+  --bn-colors-editor-background: #003366; /* Dark blue for light mode */
+}
+
+.bn-container .bn-editor {
+  background-color: #003366; /* Dark blue background */
+}

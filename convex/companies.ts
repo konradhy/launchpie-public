@@ -13,11 +13,10 @@ export const create = mutation({
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
-      throw new ConvexError(
-      { message: "You must be logged in to create a company.",
-         severity: "low"
-      }
-      );
+      throw new ConvexError({
+        message: "You must be logged in to create a company.",
+        severity: "low",
+      });
     }
 
     //Because you can only have one company.
@@ -27,12 +26,11 @@ export const create = mutation({
       .first();
 
     if (existingCompany) {
-      throw new ConvexError(
-{
-        message: "Users on your plan can only have one company. Please contact support to hear about our enterprise plans.",
-        severity: "low"
-}
-      );
+      throw new ConvexError({
+        message:
+          "Users on your plan can only have one company. Please contact support to hear about our enterprise plans.",
+        severity: "low",
+      });
     }
 
     const company = await ctx.db.insert("companies", {
@@ -48,6 +46,7 @@ export const create = mutation({
       registered: "Pending",
       taxId: "Pending",
       riskMultiplier: 2,
+      associatedUsers: [identity.subject],
     });
 
     return company;
@@ -63,28 +62,24 @@ export const insertOfficer = mutation({
     title: v.optional(v.string()),
     type: v.string(),
     hourlyRate: v.optional(v.number()),
-
-    
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
-      throw new ConvexError(
-        { message: "You must be logged in to update a company. Issue inserting officer",
-          severity: "low"
-        }
-      );
+      throw new ConvexError({
+        message:
+          "You must be logged in to update a company. Issue inserting officer",
+        severity: "low",
+      });
     }
 
     const currentCompany = await ctx.db.get(args.companyId);
 
-
     if (!currentCompany) {
       throw new ConvexError({
         message: `We couldn't find the right company. Issue inserting officer`,
-        severity: "low"
+        severity: "low",
       });
-   
     }
 
     if (args.type === "Shareholder") {
@@ -95,11 +90,10 @@ export const insertOfficer = mutation({
       const person = currentCompany.shareholders.find(
         (shareholder) => shareholder.personId === args.personId,
       );
- 
+
       if (person) {
         person.equity = args.equity || 0;
         person.hourlyRate = args.hourlyRate || 20;
-       
       } else {
         //if the person does not exist, add them to the array
         currentCompany.shareholders.push({
@@ -142,7 +136,7 @@ export const insertOfficer = mutation({
         currentCompany.shareholders.push({
           personId: args.personId,
           equity: args.equity || 0,
-            hourlyRate: args.hourlyRate || 20,
+          hourlyRate: args.hourlyRate || 20,
         });
       }
       const director = currentCompany.directors.find(
@@ -158,7 +152,6 @@ export const insertOfficer = mutation({
       }
     }
 
-   
     const company = await ctx.db.patch(args.companyId, currentCompany);
 
     return company;
@@ -175,7 +168,6 @@ export const insertMultipleOfficers = mutation({
         title: v.optional(v.string()),
         type: v.optional(v.string()),
         hourlyRate: v.optional(v.number()),
-
       }),
     ),
   },
@@ -231,13 +223,13 @@ export const insertMultipleOfficers = mutation({
       );
       if (existingIndex > -1) {
         company.shareholders[existingIndex].equity = person.equity || 0;
-        company.shareholders[existingIndex].hourlyRate = person.hourlyRate || 20;
-
+        company.shareholders[existingIndex].hourlyRate =
+          person.hourlyRate || 20;
       } else {
         company.shareholders.push({
           personId: person.personId,
           equity: person.equity || 0,
-            hourlyRate: person.hourlyRate || 20,
+          hourlyRate: person.hourlyRate || 20,
         });
       }
     }
@@ -258,7 +250,6 @@ export const insertMultipleOfficers = mutation({
   },
 });
 
-
 export const getById = query({
   args: {
     id: v.id("companies"),
@@ -267,12 +258,12 @@ export const getById = query({
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
 
-    if(!identity){
-        throw new ConvexError({
-            message: "You must be logged in to view a company.",
-            severity: "low"
-        });
-        }
+    if (!identity) {
+      throw new ConvexError({
+        message: "You must be logged in to view a company.",
+        severity: "low",
+      });
+    }
     const userId = identity.subject;
     //make sure that the userId matches either the userId or the associatedUsers
     const company = await ctx.db.get(args.id);
@@ -280,24 +271,23 @@ export const getById = query({
     if (!company) {
       throw new ConvexError({
         message: "We couldn't find the company you are looking for.",
-        severity: "low"
+        severity: "low",
       });
     }
 
-
-    if (company.userId !== userId && !company.associatedUsers?.includes(userId)) {
+    if (
+      company.userId !== userId &&
+      !company.associatedUsers?.includes(userId)
+    ) {
       throw new ConvexError({
         message: "Something went wrong",
-        severity: "low"
+        severity: "low",
       });
     }
-    
-
 
     return ctx.db.get(args.id);
   },
 });
-
 
 export const getByUserId = query({
   handler: async (ctx) => {

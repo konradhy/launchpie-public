@@ -26,12 +26,12 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
     return redirect("/");
   }
   return (
-    <div className=" flex dark:bg-[#1F1F1F]  h-screen  bg-slate-200 ">
+    <div className=" flex dark:bg-slate-800  h-screen  bg-slate-200 ">
       <Navigation />
       <SearchCommand />
       <ModalProvider />
 
-      <main className="flex-1 overflow-y-auto bg-slate-100 shadow-inner">
+      <main className="flex-1 overflow-y-auto bg-slate-100 shadow-inner dark:bg-slate-600 ">
         {/* <ModalProvider /> */}
 
         {children}

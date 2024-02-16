@@ -83,7 +83,7 @@ export const Profile = ({ initialData, index }: ProfileProps) => {
     <div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className="flex justify-between col-span-1">
+          <div className="flex justify-between col-span-1 ">
             <FormField
               name="firstName"
               control={form.control}
