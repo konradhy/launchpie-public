@@ -2,6 +2,15 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
+  users: defineTable({
+    name: v.string(),
+    tokenIdentifier: v.string(),
+    credits: v.number(),
+    membership: v.string(),
+    email: v.string(),
+    companyId: v.optional(v.id("companies")),
+  }).index("by_token", ["tokenIdentifier"]),
+
   companies: defineTable({
     companyName: v.string(),
     email: v.string(),
@@ -59,14 +68,16 @@ export default defineSchema({
     updatedAt: v.string(),
     userId: v.string(),
     email: v.string(),
-    linkedUserId: v.optional(v.string()),
+    linkedUserId: v.optional(v.string()), //it's easier and I am not refactoring at this time
     hourlyRate: v.number(),
     role: v.string(),
     profilePicture: v.optional(v.string()),
     companyId: v.optional(v.id("companies")), //made mandatory later
+    associatedUserId: v.optional(v.id("users")), //not currently in use
   })
     .index("by_user", ["userId"])
-    .index("by_linkedUserId", ["linkedUserId"]),
+    .index("by_linkedUserId", ["linkedUserId"])
+    .index("by_email", ["email"]),
 
   tasks: defineTable({
     title: v.optional(v.string()),

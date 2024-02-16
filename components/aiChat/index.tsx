@@ -121,7 +121,7 @@ export function Dialog({
       ),
     [remoteMessages, welcomeMessage],
   );
-  const sendMessage = useMutation(api.messages.send); //why isn't this working?
+  const sendMessage = useMutation(api.messages.send);
 
   const clearMessages = useMutation(api.messages.clear);
 
@@ -157,7 +157,7 @@ export function Dialog({
     if (isScrolled) {
       return;
     }
-    // Using `setTimeout` to make sure scrollTo works on button click in Chrome
+
     setTimeout(() => {
       listRef.current?.scrollTo({
         top: listRef.current.scrollHeight,
@@ -175,7 +175,7 @@ export function Dialog({
         "shadow-[0px_5px_40px_rgba(0,0,0,0.16),0_20px_25px_-5px_rgb(0,0,0,0.1)] " +
         "dark:shadow-[0px_5px_40px_rgba(0,0,0,0.36),0_20px_25px_-5px_rgb(0,0,0,0.3)] " +
         (expanded
-          ? "left-0 top-0 z-[100000]"
+          ? "left-0 top-0 z-[1000000]"
           : "w-full sm:max-w-[25rem] sm:min-w-[25rem] h-[30rem]")
       }
     >
