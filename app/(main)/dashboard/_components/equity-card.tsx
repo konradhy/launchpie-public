@@ -12,7 +12,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 const TaskCard = ({ task, detail }: { task: string; detail: string }) => {
   return (
-    <div className="bg-primary/10 p-2 rounded-lg mb-2 last:mb-0 shadow-inner hover:bg-primary/20 cursor-pointer dark:bg-gray-800">
+    <div className="bg-primary/10 p-2 rounded-lg mb-2 last:mb-0 shadow-inner hover:bg-primary/20 dark:hover:bg-gray-700 cursor-pointer dark:bg-gray-800">
       <p className="text-sm font-semibold truncate">{task}</p>
       <p className="text-xs text-gray-500 truncate">{detail}</p>
     </div>

@@ -9,8 +9,18 @@ import { AvatarImage, AvatarFallback, Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-const TaskCard = ({ title, dueDate, reviewStatus, badgeColor }) => (
-  <div className="p-4 bg-primary/5 rounded-lg shadow-md flex items-center justify-between cursor-pointer hover:bg-primary/10 dark:bg-slate-800">
+const TaskCard = ({
+  title,
+  dueDate,
+  reviewStatus,
+  badgeColor,
+}: {
+  title: string;
+  dueDate: string;
+  reviewStatus: string;
+  badgeColor: string;
+}) => (
+  <div className="p-4 bg-primary/5 rounded-lg shadow-md flex items-center justify-between cursor-pointer hover:bg-primary/10 dark:hover:bg-gray-700  dark:bg-slate-800">
     <Avatar>
       <AvatarImage src="/placeholder-avatar.png" />
       <AvatarFallback>U</AvatarFallback>
