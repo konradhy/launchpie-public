@@ -9,6 +9,7 @@ import {
   RecursiveCharacterTextSplitter,
   CharacterTextSplitter,
 } from "langchain/text_splitter";
+import { validateUserAndCompany } from "./helpers/utils";
 
 export const generateUploadUrl = mutation({
   handler: async (ctx) => {
@@ -35,30 +36,7 @@ export const saveStorageIds = mutation({
     companyId: v.id("companies"),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-
-    if (!identity) {
-      throw new ConvexError({
-        message:
-          "You must be logged in to upload a file. Please log in and try again.",
-        severity: "low",
-      });
-    }
-
-    const existingCompany = await ctx.db.get(args.companyId);
-    if (!existingCompany) {
-      throw new ConvexError({
-        message: "Company not found. Was the company deleted?",
-        severity: "low",
-      });
-    }
-
-    if (existingCompany.userId !== identity.subject) {
-      throw new ConvexError({
-        message: "Something went wrong.",
-        severity: "low",
-      });
-    }
+    const { identity } = await validateUserAndCompany(ctx, "Files");
     //configure to save multiple files
 
     const fileIds = await Promise.all(
@@ -66,7 +44,7 @@ export const saveStorageIds = mutation({
         ctx.db.insert("documents", {
           storageId: file.storageId,
           fileName: file.fileName,
-          userId: identity.subject,
+          userId: identity.tokenIdentifier,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           isArchived: false,
@@ -101,38 +79,7 @@ export const saveStorageIds = mutation({
 
 export const getSearch = query({
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-
-    if (!identity) {
-      throw new ConvexError({
-        message: "You must be logged in to search for files.",
-        severity: "low",
-      });
-    }
-
-    const userId = identity.subject;
-
-    const company = await ctx.db
-      .query("companies")
-      .withIndex("by_user", (q) => q.eq("userId", userId))
-      .first();
-
-    if (!company) {
-      throw new ConvexError({
-        message: "We couldn't find the company you are looking for.",
-        severity: "low",
-      });
-    }
-
-    if (
-      company.userId !== userId &&
-      !company.associatedUsers?.includes(userId)
-    ) {
-      throw new ConvexError({
-        message: "Something went wrong",
-        severity: "low",
-      });
-    }
+    const { company } = await validateUserAndCompany(ctx, "CompanyInformation");
 
     const companyFiles = await ctx.db
       .query("documents")
@@ -149,42 +96,7 @@ export const getSearch = query({
 export const archive = mutation({
   args: { id: v.id("documents") },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-
-    if (!identity) {
-      throw new ConvexError({
-        message: "You must be logged in to archive a file.",
-        severity: "low",
-      });
-    }
-
-    const userId = identity.subject;
-    //grab the file using the id
-    //search for the company using the companyId
-    //check if the user is associated with the company
-    //I should find the company using the companyId that's saved in the documents schema
-    const company = await ctx.db
-      .query("companies")
-      .withIndex("by_user", (q) => q.eq("userId", userId))
-      .first();
-
-    if (!company) {
-      throw new ConvexError({
-        message: "We couldn't find the company you are looking for.",
-        severity: "low",
-      });
-    }
-
-    //file must belong to the user or to an associated user
-    if (
-      company.userId !== userId &&
-      !company.associatedUsers?.includes(userId)
-    ) {
-      throw new ConvexError({
-        message: "Something went wrong",
-        severity: "low",
-      });
-    }
+    await validateUserAndCompany(ctx, "Files");
 
     await ctx.db.patch(args.id, {
       isArchived: true,
@@ -199,38 +111,7 @@ export const serveFile = query({
     id: v.id("documents"),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-
-    if (!identity) {
-      throw new ConvexError({
-        message: "You must be logged in to view a file.",
-        severity: "low",
-      });
-    }
-
-    const userId = identity.subject;
-
-    const company = await ctx.db
-      .query("companies")
-      .withIndex("by_user", (q) => q.eq("userId", userId))
-      .first();
-
-    if (!company) {
-      throw new ConvexError({
-        message: "We couldn't find the company you are looking for.",
-        severity: "low",
-      });
-    }
-
-    if (
-      company.userId !== userId &&
-      !company.associatedUsers?.includes(userId)
-    ) {
-      throw new ConvexError({
-        message: "Something went wrong",
-        severity: "low",
-      });
-    }
+    await validateUserAndCompany(ctx, "CompanyInformation");
 
     const document = await ctx.db.get(args.id);
 
@@ -245,7 +126,6 @@ export const serveFile = query({
 
     const url = await ctx.storage.getUrl(document.storageId as Id<"_storage">);
 
-    //generate the file url
     return url;
   },
 });
@@ -316,3 +196,5 @@ export const saveChunks = internalMutation({
     });
   },
 });
+
+//the only thing that checks if you're authenticated in when you go to the dashboard is the upload files  search thing

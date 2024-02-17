@@ -1,4 +1,4 @@
-type DetailProps = {
+export type DetailProps = {
   label: string;
   value: string;
 };

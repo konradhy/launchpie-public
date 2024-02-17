@@ -1,6 +1,5 @@
 "use client";
 
-
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import OnboardingHeader from "../onboarding-header";
@@ -10,7 +9,6 @@ import OnboardingProgress from "../onboarding-progress";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
-
 
 import { Button } from "@/components/ui/button";
 
@@ -56,7 +54,7 @@ export default function Onboarding04() {
                   </h1>
                   <Button
                     className="bg-indigo-500 hover:bg-indigo-700 text-white py-2 px-4 rounded"
-                    onClick={() => router.push("/dashboard1")}
+                    onClick={() => router.push("/dashboard")}
                   >
                     Go To Dashboard -&gt;
                   </Button>

@@ -12,7 +12,6 @@ To do
 
 import { Metadata } from "next";
 
-import useStoreUserEffect from "@/hooks/use-store-user";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import RecentSales from "./_components/recent-stakes";

@@ -27,7 +27,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-import { toast } from "sonner"
+import { toast } from "sonner";
+import useStoreUserEffect from "@/hooks/use-store-user";
 
 const formSchema = z.object({
   companyName: z
@@ -54,6 +55,7 @@ const formSchema = z.object({
 });
 
 export default function Onboarding01() {
+  useStoreUserEffect();
   const router = useRouter();
   const create = useMutation(api.companies.create);
   //const { toast } = useToast();
@@ -75,21 +77,15 @@ export default function Onboarding01() {
     try {
       console.log("Form data", data);
       const companyId = await create(data);
-      toast.success(`${data.companyName} created!`,{
+      toast.success(`${data.companyName} created!`, {
         description: "Your company has been created successfully",
+      });
 
-      })
-     
       router.push(`/onboarding-02?companyId=${companyId}`);
     } catch (error) {
-      const errorMessage = error instanceof ConvexError ? error.message : "An error occurred";
-      toast.error(errorMessage )
-
-    
-
-
-
-     
+      const errorMessage =
+        error instanceof ConvexError ? error.message : "An error occurred";
+      toast.error(errorMessage);
     }
   };
 

@@ -13,11 +13,10 @@ export const Heading = () => {
     <div className="max-w-3xl space-y-4 dark:text-amber-50">
       <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold">
         {appName}: Equity{" "}
-        <span className="italic text-blue-500">Reimagined</span>
-       {" "} for Startups
+        <span className="italic text-blue-500">Reimagined</span> for Startups
       </h1>
       <h2 className="text-base sm:text-xl md:text-2xl font-medium dark:text-amber-50">
-     Automate Fair Share Distribution to Fuel Startup Success and Harmony
+        Automate Fair Share Distribution to Fuel Startup Success and Harmony
       </h2>
       {isLoading && (
         <div className="w-full flex items-center justify-center">
@@ -26,12 +25,18 @@ export const Heading = () => {
       )}
 
       {isAuthenticated && !isLoading && (
-        <Button asChild>
-          <Link href="/dashboard">
-            Enter {`${appName}`}
-            <ArrowRightCircle className="h-4 w-4 ml-2" />
+        <div className="flex gap-4 items-center justify-center">
+          <Button asChild>
+            <Link href="/dashboard">
+              Enter {`${appName}`}
+              <ArrowRightCircle className="h-4 w-4 ml-2" />
+            </Link>
+          </Button>
+
+          <Link href={`/onboarding-01`}>
+            <span className="hover:text-secondary">Create New {appName} </span>
           </Link>
-        </Button>
+        </div>
       )}
 
       {!isAuthenticated && !isLoading && (

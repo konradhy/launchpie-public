@@ -9,6 +9,7 @@ export default defineSchema({
     membership: v.string(),
     email: v.string(),
     companyId: v.optional(v.id("companies")),
+    linkedPersonId: v.optional(v.id("persons")),
   }).index("by_token", ["tokenIdentifier"]),
 
   companies: defineTable({
@@ -26,6 +27,7 @@ export default defineSchema({
     taxId: v.string(),
     riskMultiplier: v.number(),
     files: v.optional(
+      //remove next purge
       v.array(
         v.object({
           storageId: v.string(),
@@ -57,7 +59,8 @@ export default defineSchema({
     ),
   })
     .index("by_user", ["userId"])
-    .index("by_companyName", ["companyName"]),
+    .index("by_companyName", ["companyName"])
+    .index("by_associatedUsers", ["associatedUsers"]),
 
   persons: defineTable({
     firstName: v.string(),
@@ -72,8 +75,7 @@ export default defineSchema({
     hourlyRate: v.number(),
     role: v.string(),
     profilePicture: v.optional(v.string()),
-    companyId: v.optional(v.id("companies")), //made mandatory later
-    associatedUserId: v.optional(v.id("users")), //not currently in use
+    companyId: v.id("companies"),
   })
     .index("by_user", ["userId"])
     .index("by_linkedUserId", ["linkedUserId"])
@@ -122,6 +124,7 @@ export default defineSchema({
     icon: v.optional(v.string()),
     isPublished: v.boolean(),
     editors: v.optional(v.array(v.string())),
+    companyId: v.id("companies"),
   })
     .index("by_user", ["userId"])
     .index("by_user_parent", ["userId", "parentNote"])

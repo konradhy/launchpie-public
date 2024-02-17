@@ -11,8 +11,23 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { PersonDetail } from "./person-detail";
+import { Doc } from "@/convex/_generated/dataModel";
+import { Spinner } from "@/components/spinner";
 
-export const InfoSection = ({ title, description, details }) => {
+interface InfoSectionProps {
+  title: string;
+  description: string;
+  details: Doc<"persons">[] | null;
+}
+
+export const InfoSection = ({
+  title,
+  description,
+  details,
+}: InfoSectionProps) => {
+  if (!details) {
+    return <Spinner />;
+  }
   return (
     <Sheet>
       <SheetTrigger asChild>

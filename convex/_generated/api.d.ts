@@ -16,6 +16,7 @@ import type {
 } from "convex/server";
 import type * as companies from "../companies.js";
 import type * as files from "../files.js";
+import type * as helpers_utils from "../helpers/utils.js";
 import type * as helpers from "../helpers.js";
 import type * as ingest_embed from "../ingest/embed.js";
 import type * as ingest_extract from "../ingest/extract.js";
@@ -37,6 +38,7 @@ import type * as users from "../users.js";
 declare const fullApi: ApiFromModules<{
   companies: typeof companies;
   files: typeof files;
+  "helpers/utils": typeof helpers_utils;
   helpers: typeof helpers;
   "ingest/embed": typeof ingest_embed;
   "ingest/extract": typeof ingest_extract;

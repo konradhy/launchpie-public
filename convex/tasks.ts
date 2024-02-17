@@ -1,9 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { ConvexError, v } from "convex/values";
-
-//we have an issue here. Because we get companyId from the client, then anyone, once they know the company could create a task for that company.
-//maybe we need to make a helper function. to handle the associated user/userid check
-
+import { validateUserAndCompany } from "./helpers/utils";
 
 export const create = mutation({
   args: {
@@ -36,20 +33,15 @@ export const create = mutation({
     companyId: v.string(),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-         throw new ConvexError({
-            message: "You must be logged in to get shareholder details.",
-            severity: "low",
-        });
-    
-    }
-    const userId = identity.subject;
+    const { user, identity } = await validateUserAndCompany(
+      ctx,
+      "CompanyInformation",
+    );
 
     const taskId = await ctx.db.insert("tasks", {
       title: args.title,
       description: args.description,
-      assignees: args.assignees || [userId],
+      assignees: args.assignees || [user.linkedPersonId || ""],
       dueDate: args.dueDate || "No due date",
       estimatedTime: args.estimatedTime,
       taskState: args.taskState || "notStarted",
@@ -57,11 +49,11 @@ export const create = mutation({
       meetingAgendaFlag: args.meetingAgendaFlag || false,
       equityValue: args.equityValue,
       notes: args.notes,
-      userId: userId,
+      userId: identity.tokenIdentifier,
       companyId: args.companyId,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      updatedBy: userId,
+      updatedBy: identity.tokenIdentifier,
       priority: args.priority || "low",
       category: args.category || "uncategorized",
       isArchived: false,
@@ -72,28 +64,8 @@ export const create = mutation({
 
 export const getByCompanyId = query({
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-         throw new ConvexError({
-            message: "You must be logged in to get shareholder details.",
-            severity: "low",
-        });
+    const { company } = await validateUserAndCompany(ctx, "CompanyInformation");
 
-  
-    }
-    //search for the company by the userId which is the identity.subject
-    const company = await ctx.db
-      .query("companies")
-      .withIndex("by_user", (q) => q.eq("userId", identity.subject))
-      .unique();
-
-    if (!company) {
-      //search for the company via the associatedUsers
-      //if not found then throw an error
-      throw new ConvexError("Company not found. Did you delete your company?");
-    }
-
-    
     const tasks = await ctx.db
       .query("tasks")
       .withIndex("by_company", (q) => q.eq("companyId", company._id))

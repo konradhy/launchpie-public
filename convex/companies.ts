@@ -22,7 +22,7 @@ export const create = mutation({
     //Because you can only have one company.
     const existingCompany = await ctx.db
       .query("companies")
-      .withIndex("by_user", (q) => q.eq("userId", identity.subject))
+      .withIndex("by_user", (q) => q.eq("userId", identity.tokenIdentifier))
       .first();
 
     if (existingCompany) {
@@ -41,19 +41,18 @@ export const create = mutation({
       industry: args.industry,
       companyActivities: args.companyActivities,
       updatedAt: new Date().toISOString(),
-      userId: identity.subject,
+      userId: identity.tokenIdentifier,
       status: "pending",
       registered: "Pending",
       taxId: "Pending",
       riskMultiplier: 2,
-      associatedUsers: [identity.subject],
     });
 
     return company;
   },
 });
 
-//Refactor this
+//Refactor this Also. This needs authorization. You must be an associated user to insert officers
 export const insertOfficer = mutation({
   args: {
     companyId: v.id("companies"),
@@ -158,6 +157,7 @@ export const insertOfficer = mutation({
   },
 });
 
+//update so that only associated users can insert officers
 export const insertMultipleOfficers = mutation({
   args: {
     companyId: v.id("companies"),
@@ -250,6 +250,7 @@ export const insertMultipleOfficers = mutation({
   },
 });
 
+//why would you ever need this?
 export const getById = query({
   args: {
     id: v.id("companies"),
@@ -260,14 +261,87 @@ export const getById = query({
 
     if (!identity) {
       throw new ConvexError({
-        message: "You must be logged in to view a company.",
+        message: "You must be logged in to view company details.",
         severity: "low",
       });
     }
-    const userId = identity.subject;
-    //make sure that the userId matches either the userId or the associatedUsers
-    const company = await ctx.db.get(args.id);
 
+    const userId = identity.tokenIdentifier;
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_token", (q) =>
+        q.eq("tokenIdentifier", identity.tokenIdentifier),
+      )
+      .unique();
+
+    if (!user) {
+      throw new ConvexError({
+        message:
+          "You must be logged in to view company details. We could find a user connect with this account.",
+        severity: "low",
+      });
+    }
+    if (!user.companyId) {
+      throw new ConvexError({
+        message:
+          "You must be associated with a company to view company details.",
+        severity: "low",
+      });
+    }
+
+    const company = await ctx.db.get(args.id);
+    if (!company) {
+      throw new ConvexError({
+        message: "We couldn't find the company you are looking for.",
+        severity: "low",
+      });
+    }
+
+    if (
+      company.userId !== userId &&
+      !company.associatedUsers?.includes(userId)
+    ) {
+      throw new ConvexError({
+        message:
+          "Something went wrong. Were you removed from the company? Please contact support.",
+        severity: "low",
+      });
+    }
+
+    return ctx.db.get(args.id);
+  },
+});
+
+export const getByUserId = query({
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) {
+      throw new ConvexError({
+        message: "You must be logged in to search for files.",
+        severity: "low",
+      });
+    }
+
+    const userId = identity.tokenIdentifier;
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_token", (q) =>
+        q.eq("tokenIdentifier", identity.tokenIdentifier),
+      )
+      .unique();
+
+    if (!user) {
+      throw new Error("Unauthenticated call to mutation");
+    }
+    if (!user.companyId) {
+      throw new ConvexError({
+        message: "You must be associated with a company to search for files.",
+        severity: "low",
+      });
+    }
+
+    const company = await ctx.db.get(user.companyId);
     if (!company) {
       throw new ConvexError({
         message: "We couldn't find the company you are looking for.",
@@ -285,25 +359,6 @@ export const getById = query({
       });
     }
 
-    return ctx.db.get(args.id);
-  },
-});
-
-export const getByUserId = query({
-  handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-
-    if (!identity) {
-      throw new Error("Unauthenticated");
-    }
-
-    const userId = identity.subject;
-
-    const companies = await ctx.db
-      .query("companies")
-      .withIndex("by_user", (q) => q.eq("userId", userId))
-      .unique();
-
-    return companies;
+    return company;
   },
 });

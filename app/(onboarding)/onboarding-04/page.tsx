@@ -54,7 +54,7 @@ const shareholderSchema = z.object({
       hourlyRate: z.coerce
         .number()
         .min(1, "Please enter an hourly rate greater than 0"),
-    })
+    }),
   ),
 });
 
@@ -90,26 +90,34 @@ export default function Onboarding04() {
     try {
       const { shareholders } = data;
       const persons = shareholders.map(
-        ({ firstName, lastName, dob, address, phoneNumber, email,hourlyRate }) => ({
+        ({
           firstName,
           lastName,
           dob,
           address,
           phoneNumber,
           email,
-          hourlyRate
-        })
+          hourlyRate,
+        }) => ({
+          firstName,
+          lastName,
+          dob,
+          address,
+          phoneNumber,
+          email,
+          hourlyRate,
+        }),
       );
 
-      const ids = (await create({ persons })) as Id<"persons">[];
+      const ids = (await create({ persons, companyId })) as Id<"persons">[];
 
       const companyOfficers = ids.map((personId, index) => {
         const shareholderType =
           shareholders[index].isDirector === "Shareholder"
             ? "Shareholder"
             : shareholders[index].isDirector === "Both"
-            ? "Both"
-            : "Invalid";
+              ? "Both"
+              : "Invalid";
 
         return {
           personId,
@@ -126,7 +134,7 @@ export default function Onboarding04() {
       const errorMessage =
         error instanceof ConvexError ? error.message : "An error occurred";
       toast.error(errorMessage);
-      console.error(error); 
+      console.error(error);
     }
   };
   return (

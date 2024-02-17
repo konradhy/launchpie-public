@@ -1,5 +1,6 @@
 import { v, ConvexError } from "convex/values";
 import { getAll } from "convex-helpers/server/relationships";
+import { internal } from "./_generated/api";
 import { mutation, query } from "./_generated/server";
 
 export const create = mutation({
@@ -11,6 +12,8 @@ export const create = mutation({
     phoneNumber: v.string(),
     email: v.string(),
     hourlyRate: v.number(),
+    bind: v.boolean(),
+    companyId: v.id("companies"),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -30,9 +33,18 @@ export const create = mutation({
       address: args.address,
       phoneNumber: args.phoneNumber,
       updatedAt: new Date().toISOString(),
-      userId: identity.subject,
+      userId: identity.tokenIdentifier,
       email: args.email,
+      companyId: args.companyId,
     });
+
+    if (args.bind && args.companyId) {
+      await ctx.scheduler.runAfter(0, internal.users.bindUserToCompany, {
+        companyId: args.companyId,
+        userClerkId: identity.tokenIdentifier,
+        personId: person,
+      });
+    }
     return person;
   },
 });
@@ -50,6 +62,7 @@ export const createMultiple = mutation({
         hourlyRate: v.number(),
       }),
     ),
+    companyId: v.id("companies"),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -70,8 +83,9 @@ export const createMultiple = mutation({
           address: person.address,
           phoneNumber: person.phoneNumber,
           updatedAt: new Date().toISOString(),
-          userId: identity.subject,
+          userId: identity.tokenIdentifier,
           email: person.email,
+          companyId: args.companyId,
         });
 
         ids.push(id);

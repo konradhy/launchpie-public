@@ -25,6 +25,7 @@ import { api } from "@/convex/_generated/api";
 import { useFileUpload } from "@/hooks/use-file-upload";
 import { useNewTask } from "@/hooks/use-new-task";
 import { useSearch } from "@/hooks/use-search";
+import useStoreUserEffect from "@/hooks/use-store-user";
 import { AccountSwitcher } from "./account-switcher";
 import { Separator } from "@/components/ui/separator";
 import { Nav } from "./nav";
@@ -53,6 +54,7 @@ export const Navigation = () => {
   const search = useSearch();
   const router = useRouter();
   const settings = useSettings();
+  useStoreUserEffect();
 
   //refs
   const isResizingRef = useRef(false);
@@ -284,10 +286,18 @@ export const Navigation = () => {
               welcomeMessage="Hey there, what can I help you with?"
               renderTrigger={(onClick) => (
                 <div
-                  className="flex items-center justify-center h-12 w-full  text-primary rounded-md cursor-pointer hover:bg-primary-dark transition-all"
+                  className="flex items-center justify-center h-12 w-full hover:text-primary/60 text-primary   dark:text-secondary dark:hover:text-secondary/60 rounded-md cursor-pointer  transition-all"
                   onClick={onClick}
                 >
-                  Ask QuityAi <Bot className="h-6 w-6 ml-2" />
+                  {isIconised ? (
+                    <Bot className="h-6 w-6" />
+                  ) : (
+                    <>
+                      <Bot className="h-6 w-6 mr-2 " />
+                      <span className="">Ask QuityAi</span>
+                      <Bot className="h-6 w-6 ml-2" />
+                    </>
+                  )}
                 </div>
               )}
             />

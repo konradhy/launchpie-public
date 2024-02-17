@@ -24,6 +24,7 @@ import { InfoSection } from "./info-section";
 import { usePersonsDetails } from "@/hooks/use-persons-details";
 import { ConvexAiChat } from "@/components/aiChat";
 import { Button } from "@/components/ui/button";
+import { Doc } from "@/convex/_generated/dataModel";
 
 const CompanyDetailsCard = () => {
   const companyDetails = useQuery(api.companies.getByUserId);
@@ -75,7 +76,9 @@ const CompanyDetailsCard = () => {
             <InfoSection
               title="Shareholders"
               description="Shareholder Information"
-              details={shareholderDetails}
+              details={shareholderDetails.filter(
+                (detail): detail is Doc<"persons"> => detail !== null,
+              )}
             />
           )}
         </div>
@@ -89,7 +92,9 @@ const CompanyDetailsCard = () => {
             <InfoSection
               title="Directors"
               description="Director Information"
-              details={directorDetails}
+              details={shareholderDetails.filter(
+                (detail): detail is Doc<"persons"> => detail !== null,
+              )}
             />
           )}
         </div>

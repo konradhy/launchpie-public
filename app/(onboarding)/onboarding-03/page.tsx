@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { InfoCircledIcon } from "@radix-ui/react-icons";
-import { Info } from 'lucide-react';
+import { Info } from "lucide-react";
 
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
@@ -38,6 +38,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Switch } from "@/components/ui/switch";
 
 const shareholderSchema = z.object({
   firstName: z.string().min(1, "Please enter the shareholder's first name"),
@@ -48,6 +49,7 @@ const shareholderSchema = z.object({
   phoneNumber: z.string().min(1, "Please enter the shareholder's phone number"),
   email: z.string().email("Please enter a valid email address"),
   amount: z.coerce.number().max(4, "Please enter a number between 0 and 4"),
+  bind: z.boolean(),
   hourlyRate: z.coerce
     .number()
     .min(1, "Please enter an hourly rate greater than 0"),
@@ -56,6 +58,7 @@ const shareholderSchema = z.object({
 export default function Onboarding03() {
   const create = useMutation(api.persons.create);
   const update = useMutation(api.companies.insertOfficer);
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const companyId = searchParams.get("companyId") as Id<"companies">;
@@ -73,6 +76,7 @@ export default function Onboarding03() {
       email: "",
       amount: 0,
       hourlyRate: 20,
+      bind: false,
     },
   });
 
@@ -81,7 +85,7 @@ export default function Onboarding03() {
   const onSubmit = async (data: z.infer<typeof shareholderSchema>) => {
     try {
       let { isDirector, amount, ...rest } = data;
-      const personId = await create(rest);
+      const personId = await create({ ...rest, companyId });
 
       //I just added await and didn't test it
       await update({ companyId, personId, type: isDirector });
@@ -93,9 +97,9 @@ export default function Onboarding03() {
         router.push(`/onboarding-05?companyId=${companyId}`);
       }
     } catch (error) {
-      const errorMessage = error instanceof ConvexError ? error.message : "An error occurred";
-      toast.error(errorMessage )
-
+      const errorMessage =
+        error instanceof ConvexError ? error.message : "An error occurred";
+      toast.error(errorMessage);
     }
   };
 
@@ -244,9 +248,12 @@ export default function Onboarding03() {
                             <TooltipProvider>
                               <Tooltip delayDuration={300}>
                                 <TooltipTrigger asChild>
-                                 <button onClick={(e) => e.preventDefault()} className="focus:outline-none">
-            <Info className="w-4 h-4 ml-1" />
-          </button>
+                                  <button
+                                    onClick={(e) => e.preventDefault()}
+                                    className="focus:outline-none"
+                                  >
+                                    <Info className="w-4 h-4 ml-1" />
+                                  </button>
                                 </TooltipTrigger>
 
                                 <TooltipContent side="right">
@@ -300,6 +307,32 @@ export default function Onboarding03() {
                             </RadioGroup>
                           </FormControl>
                           <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="bind"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border dark:border-zinc-600 p-3  shadow-sm">
+                          <div className="flex-col items-center justify-center space-y-4">
+                            <div className="space-y-2">
+                              <FormLabel>Is this shareholder you?</FormLabel>
+                              <FormDescription>
+                                Switch on to bind this shareholder to your
+                                account. This is{" "}
+                                <span className="text-destructive">
+                                  irreversible.
+                                </span>
+                              </FormDescription>
+                            </div>
+                            <FormControl>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                          </div>
                         </FormItem>
                       )}
                     />
