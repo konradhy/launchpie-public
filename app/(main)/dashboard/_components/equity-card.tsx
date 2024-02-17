@@ -10,7 +10,7 @@ import {
 import { CaretSortIcon } from "@radix-ui/react-icons";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-const TaskCard = ({ task, detail }) => {
+const TaskCard = ({ task, detail }: { task: string; detail: string }) => {
   return (
     <div className="bg-primary/10 p-2 rounded-lg mb-2 last:mb-0 shadow-inner hover:bg-primary/20 cursor-pointer dark:bg-gray-800">
       <p className="text-sm font-semibold truncate">{task}</p>

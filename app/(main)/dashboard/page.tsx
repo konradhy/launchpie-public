@@ -28,6 +28,8 @@ export const metadata: Metadata = {
 };
 
 export default function DashboardPage() {
+  //i think i just pass the shareholderid here. Then i do everything else in the equity card
+  //create a new component called equity card holder. This will be a use client that holds the equity card map
   const equityData = [
     {
       shareholderName: "Alice Smith",
