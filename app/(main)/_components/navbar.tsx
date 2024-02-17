@@ -1,7 +1,6 @@
 "use client";
 import * as React from "react";
 import {
-
   Bot,
   ClipboardList,
   File,
@@ -65,7 +64,7 @@ export function Mail({
         direction="horizontal"
         onLayout={(sizes: number[]) => {
           document.cookie = `react-resizable-panels:layout=${JSON.stringify(
-            sizes
+            sizes,
           )}`;
         }}
         className="h-full max-h-[800px] items-stretch"
@@ -75,25 +74,25 @@ export function Mail({
           collapsedSize={navCollapsedSize}
           collapsible={true}
           minSize={15}
-          maxSize={20}
-          onCollapse={(collapsed) => {
+          maxSize={20} // @ts-ignore
+          onCollapse={(collapsed: boolean) => {
             setIsCollapsed(collapsed);
             document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(
-              collapsed
+              collapsed,
             )}`;
           }}
           className={cn(
             isCollapsed &&
-              "min-w-[50px] transition-all duration-300 ease-in-out"
+              "min-w-[50px] transition-all duration-300 ease-in-out",
           )}
         >
           <div
             className={cn(
               "flex h-[52px] items-center justify-center",
-              isCollapsed ? "h-[52px]" : "px-2"
+              isCollapsed ? "h-[52px]" : "px-2",
             )}
           >
-            <AccountSwitcher isCollapsed={isCollapsed} accounts={accounts} />
+            <AccountSwitcher isIconised={isCollapsed} accounts={accounts} />
           </div>
           <Separator />
           <Nav
@@ -130,7 +129,6 @@ export function Mail({
           <Nav
             isCollapsed={isCollapsed}
             links={[
-       
               {
                 title: "Upload File",
                 icon: UploadCloud,
@@ -141,7 +139,7 @@ export function Mail({
                 icon: Bot,
                 variant: "ghost",
               },
-                     {
+              {
                 title: "New Dollop",
                 icon: Plus,
                 variant: "ghost",
@@ -156,8 +154,7 @@ export function Mail({
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
-            {/*put children here */}
-      
+          {/*put children here */}
         </ResizablePanel>
       </ResizablePanelGroup>
     </TooltipProvider>

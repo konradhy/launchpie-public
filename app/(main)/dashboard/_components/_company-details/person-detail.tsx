@@ -10,8 +10,15 @@ import {
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { Profile } from "./profile";
+import { Doc } from "@/convex/_generated/dataModel";
 
-export const PersonDetail = ({ detail, index }) => {
+export const PersonDetail = ({
+  detail,
+  index,
+}: {
+  detail: Doc<"persons">;
+  index: number;
+}) => {
   // Logic to handle the person detail, like extracting the equity or position
   // You can adapt this part based on the specific needs of shareholders and directors
 
@@ -35,9 +42,7 @@ export const PersonDetail = ({ detail, index }) => {
               for reference.
             </DialogDescription>
           </DialogHeader>
-          <p className="text-sm text-gray-500 mt-2">
-            Current equity: {detail.equity}%
-          </p>
+          <p className="text-sm text-gray-500 mt-2">Current equity: %%%</p>
           <Separator />
           {detail && (
             <Profile
