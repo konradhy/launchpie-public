@@ -1,6 +1,6 @@
-import { DataModel, Doc } from "../_generated/dataModel";
+import { DataModel, Doc, Id } from "../_generated/dataModel";
 import { GenericQueryCtx, UserIdentity } from "convex/server";
-import { ConvexError, v } from "convex/values";
+import { ConvexError, GenericId, v } from "convex/values";
 
 enum ErrorMessage {
   Files = "You must be logged in to access files.",
@@ -9,8 +9,9 @@ enum ErrorMessage {
 }
 
 //this is fine for creating, but for updating we'll need to pass the id of the company which will be on the document.
+//actually all i have to do is compare the company id on the user to the company id on the task
 export async function validateUserAndCompany(
-  ctx: GenericQueryCtx<DataModel>, // Adjust the type accordingly
+  ctx: GenericQueryCtx<DataModel>,
   errorContext: keyof typeof ErrorMessage,
 ): Promise<{
   user: Doc<"users">;
