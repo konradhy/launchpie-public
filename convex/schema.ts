@@ -84,7 +84,7 @@ export default defineSchema({
   tasks: defineTable({
     title: v.optional(v.string()),
     description: v.string(),
-    assignees: v.array(v.string()), //this should be an array of personIds
+    assignees: v.array(v.id("persons")), //this should be an array of personIds
     dueDate: v.string(),
     estimatedTime: v.number(),
     actualTime: v.optional(v.number()),
@@ -102,7 +102,7 @@ export default defineSchema({
     equityValue: v.number(),
     notes: v.optional(v.string()),
     userId: v.string(),
-    companyId: v.string(),
+    companyId: v.id("companies"),
     createdAt: v.string(),
     updatedAt: v.string(),
     updatedBy: v.string(),

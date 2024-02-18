@@ -8,8 +8,6 @@ enum ErrorMessage {
   CompanyInformation = "You must be logged in to access company information.",
 }
 
-//this is fine for creating, but for updating we'll need to pass the id of the company which will be on the document.
-//actually all i have to do is compare the company id on the user to the company id on the task
 export async function validateUserAndCompany(
   ctx: GenericQueryCtx<DataModel>,
   errorContext: keyof typeof ErrorMessage,
@@ -18,7 +16,6 @@ export async function validateUserAndCompany(
   company: Doc<"companies">;
   identity: UserIdentity;
 }> {
-  // Adjust the return types accordingly
   const identity = await ctx.auth.getUserIdentity();
 
   if (!identity) {

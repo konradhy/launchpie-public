@@ -7,6 +7,8 @@ import { useEffect, useState } from "react";
 import { FileUploadModal } from "../modals/file-upload-modal";
 import { NewTaskModal } from "../modals/new-task-modal";
 import { SettingsModal } from "../modals/settings-modal";
+import { EditTaskModal } from "../modals/edit-task-modal";
+import { CompleteTaskModal } from "../modals/complete-task-modal";
 
 export const ModalProvider = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -25,6 +27,8 @@ export const ModalProvider = () => {
       <SettingsModal />
       <FileUploadModal />
       <NewTaskModal />
+      <EditTaskModal />
+      <CompleteTaskModal />
     </>
   );
 };

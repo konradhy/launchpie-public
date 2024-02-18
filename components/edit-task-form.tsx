@@ -5,8 +5,7 @@ import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
-import { useNewTask } from "@/hooks/use-new-task";
+import { Doc, Id } from "@/convex/_generated/dataModel";
 
 import {
   Form,
@@ -40,21 +39,23 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "./ui/textarea";
+import { useEditTask } from "@/hooks/use-edit-task";
 
 //import { DatePicker } from "@/components/ui/datepicker"; // Assuming you have a DatePicker component
 
-interface NewTaskFormProps {
-  companyId: Id<"companies">;
+interface EditTaskFormProps {
+  task: Doc<"tasks">;
 }
 
 const taskSchema = z.object({
-  description: z.string().min(1, "Description is required"),
-  assignees: z
-    .array(z.string())
-    .refine((value) => value.some((item) => item), {
-      message: "You have to select at least one item.",
-    })
-    .optional(),
+  title: z.string().min(3, "Title is required"),
+  description: z.string().min(5, "Description is required"),
+  // assignees: z
+  //   .array(z.string())
+  //   .refine((value) => value.some((item) => item), {
+  //     message: "You have to select at least one item.",
+  //   })
+  //   .optional(),
   dueDate: z.string().optional(),
   estimatedTime: z.coerce.number().min(1, "Estimated time is required"),
   taskState: z
@@ -74,55 +75,68 @@ const taskSchema = z.object({
   meetingAgendaFlag: z.boolean().optional(),
   equityValue: z.number().min(1, "Equity value is required"),
   notes: z.string().optional(),
-  companyId: z.string(),
+
   priority: z
     .union([z.literal("low"), z.literal("medium"), z.literal("high")])
     .optional(),
   category: z.string().optional(),
 });
 
-export const NewTaskForm = ({ companyId }: NewTaskFormProps) => {
+export const EditTaskForm = ({ task }: EditTaskFormProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const newTask = useNewTask();
-  const shareHolders = useQuery(api.persons.getShareholdersByCompanyId, {
-    companyId,
-  });
-  const createTask = useMutation(api.tasks.create);
+  const editTask = useEditTask();
+  const companyId = task.companyId;
+  const taskId = task._id;
+
+  const shareHolders = useQuery(
+    api.persons.getShareholdersByCompanyId,
+    task !== undefined ? { companyId } : "skip",
+  );
+  const updateTask = useMutation(api.tasks.update);
 
   const form = useForm<z.infer<typeof taskSchema>>({
     resolver: zodResolver(taskSchema),
     defaultValues: {
-      assignees: [], //I think you need to make assignees optional and make sure it has no default value to auto pass user Id later in convex function
+      //assignees: task.assignees, //figure out how to get this to work for checkboxes
 
-      estimatedTime: 1,
-      taskState: "notStarted",
-      reviewStatus: "notFlagged",
-      meetingAgendaFlag: false,
-      equityValue: 1,
-      notes: "",
-      companyId,
-      priority: "low",
-      category: "Uncategorized",
+      estimatedTime: task.estimatedTime,
+      taskState: task.taskState,
+      reviewStatus: task.reviewStatus,
+      meetingAgendaFlag: task.meetingAgendaFlag,
+      notes: task.notes,
+      priority: task.priority,
+      category: task.category,
+      title: task.title,
+      description: task.description,
+      dueDate: task.dueDate,
+      equityValue: task.equityValue,
     },
   });
 
   const isLoading = form.formState.isSubmitting;
+  console.log(taskId);
 
   const onSubmit = async (data: z.infer<typeof taskSchema>) => {
+    if (taskId === undefined) {
+      console.log("Task Id is undefined");
+      return;
+    }
     try {
-      await createTask({
-        ...data,
-        companyId: data.companyId as Id<"companies">,
-      });
-
+      console.log("testing");
+      await updateTask({ ...data, taskId });
       toast.success("Task successfully created");
 
-      newTask.onClose();
+      editTask.onClose();
     } catch (error) {
+      console.error(error);
       toast.error("An unexpected error occurred");
     }
   };
 
+  const onDebugSubmit = async () => {
+    const debugData = form.getValues(); // Temporary solution until form is fixed
+    await onSubmit(debugData);
+  };
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -141,7 +155,7 @@ export const NewTaskForm = ({ companyId }: NewTaskFormProps) => {
           )}
         />
 
-        <FormField
+        {/* <FormField
           control={form.control}
           name="assignees"
           render={() => (
@@ -149,7 +163,7 @@ export const NewTaskForm = ({ companyId }: NewTaskFormProps) => {
               <div className="mb-4">
                 <FormLabel className="text-base">Assignees</FormLabel>
                 <FormDescription>
-                  Assign the task to one or more shareholders.
+                  Who is responsible for completing this task?
                 </FormDescription>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -197,7 +211,7 @@ export const NewTaskForm = ({ companyId }: NewTaskFormProps) => {
               <FormMessage />
             </FormItem>
           )}
-        />
+        /> */}
         <FormField
           control={form.control}
           name="estimatedTime"
@@ -603,7 +617,8 @@ export const NewTaskForm = ({ companyId }: NewTaskFormProps) => {
           </CollapsibleContent>
         </Collapsible>
 
-        <Button type="submit">Create Task</Button>
+        <Button onClick={onDebugSubmit}>Edit Task</Button>
+        {/* <Button type="submit">Edit Task</Button> */}
       </form>
     </Form>
   );

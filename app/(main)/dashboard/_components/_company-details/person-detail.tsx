@@ -19,9 +19,6 @@ export const PersonDetail = ({
   detail: Doc<"persons">;
   index: number;
 }) => {
-  // Logic to handle the person detail, like extracting the equity or position
-  // You can adapt this part based on the specific needs of shareholders and directors
-
   return (
     <div className="flex items-center justify-between ">
       <Dialog>
@@ -59,9 +56,6 @@ export const PersonDetail = ({
           )}
         </DialogContent>
       </Dialog>
-      <span className="whitespace-nowrap text-sm text-gray-500">
-        {/* Display equity or position */}
-      </span>
     </div>
   );
 };
