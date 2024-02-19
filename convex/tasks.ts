@@ -1,7 +1,32 @@
-import { mutation, query } from "./_generated/server";
+import { internalMutation, mutation, query } from "./_generated/server";
 import { ConvexError, v } from "convex/values";
 import { validateUserAndCompany } from "./helpers/utils";
 import { Id } from "./_generated/dataModel";
+import { internal } from "./_generated/api";
+import { getAll } from "convex-helpers/server/relationships";
+
+//get task by id
+export const getTaskById = query({
+  args: {
+    taskId: v.id("tasks"),
+  },
+  handler: async (ctx, args) => {
+    const { company } = await validateUserAndCompany(ctx, "CompanyInformation");
+
+    const task = await ctx.db.get(args.taskId);
+    if (!task) {
+      throw new ConvexError("Task not found");
+    }
+
+    if (task.companyId !== company._id) {
+      throw new ConvexError(
+        "There is a company mismatch. Please contact support, while getting task by id",
+      );
+    }
+
+    return task;
+  },
+});
 
 export const create = mutation({
   args: {
@@ -185,42 +210,90 @@ export const completeTask = mutation({
       );
     }
 
-    //The model only really works if there is a single assignee. Workshop the idea for multiple.
-    const person = await ctx.db.get(task.assignees[0]);
+    const tv = await ctx.scheduler.runAfter(
+      0,
+      internal.tasks.calculateTheoreticalValue,
+      {
+        assignees: task.assignees,
+        actualTime: args.actualTime,
+        taskId: args.taskId,
+        companyId: company._id,
+        totalPieValue: company.totalPieValue,
+      },
+    );
+    console.log("Theoretical Value: ", tv);
 
-    const updatedTask = await ctx.db.patch(args.taskId, {
+    await ctx.db.patch(args.taskId, {
       taskState: args.taskState,
       updatedAt: new Date().toISOString(),
       updatedBy: identity.tokenIdentifier,
       notes: args.notes,
       actualTime: args.actualTime,
       meetingAgendaFlag: args.meetingAgendaFlag,
-      equityValue: args.equityValue,
     });
-
-    return updatedTask;
   },
 });
 
-//get task by id
-export const getTaskById = query({
+//calculate the theoritical value of a task which is hr * actual time
+//get the hr from the first person assigned to the task and multiply it by the actual time when the task is being completed
+//this is an internal mutation called by the completeTask mutation
+
+export const calculateTheoreticalValue = internalMutation({
   args: {
+    assignees: v.array(v.id("persons")),
+    actualTime: v.number(),
     taskId: v.id("tasks"),
+    companyId: v.id("companies"),
+    totalPieValue: v.number(),
   },
   handler: async (ctx, args) => {
-    const { company } = await validateUserAndCompany(ctx, "CompanyInformation");
+    const assigneeDetails = await getAll(ctx.db, args.assignees);
 
-    const task = await ctx.db.get(args.taskId);
-    if (!task) {
-      throw new ConvexError("Task not found");
+    if (assigneeDetails.length === 0) {
+      throw new Error("No assignees found");
     }
 
-    if (task.companyId !== company._id) {
-      throw new ConvexError(
-        "There is a company mismatch. Please contact support, while getting task by id",
-      );
+    let totalTheoreticalValue = 0;
+    const timePerAssignee = args.actualTime / assigneeDetails.length;
+
+    for (const assignee of assigneeDetails) {
+      if (!assignee || assignee.hourlyRate === undefined) {
+        // Handle the case where assignee is null or missing hourlyRate
+
+        console.error(
+          `Assignee: ${assignee?.firstName}- ${assignee?._id}  - is missing or lacks an hourly rate.`,
+        );
+
+        continue;
+      }
+
+      // Calculate the theoretical value for this assignee and add it to the total
+      totalTheoreticalValue += assignee.hourlyRate * timePerAssignee;
     }
 
-    return task;
+    await ctx.db.patch(args.taskId, {
+      equityValue: totalTheoreticalValue,
+    });
+
+    //add the theoretical value to the company's total pie value. We already know the company's total pie value from the args
+
+    await ctx.db.patch(args.companyId, {
+      totalPieValue: args.totalPieValue + totalTheoreticalValue,
+    });
+
+    //update the tv to each assigness personal equity value. If there are multiple, then we divde the total by the number of assignees
+
+    const tvPerAssignee = totalTheoreticalValue / assigneeDetails.length;
+    await Promise.all(
+      assigneeDetails.map(async (assignee) => {
+        if (!assignee) {
+          return;
+        }
+
+        await ctx.db.patch(assignee._id, {
+          equity: assignee.equity + tvPerAssignee,
+        });
+      }),
+    );
   },
 });

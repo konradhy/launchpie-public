@@ -2,12 +2,7 @@
 "use client";
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { CaretSortIcon } from "@radix-ui/react-icons";
+
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 const TaskCard = ({ task, detail }: { task: string; detail: string }) => {

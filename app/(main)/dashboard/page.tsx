@@ -5,6 +5,9 @@ To do
 
  2. Grab the last 5 tasks by userId for each user and display it in the equty card. This Can be one call where we just grab the last 100 company tasks and filter it. Think through the process
  3. Load current stakes with the logged in users current tasks
+ 4. Set the min height and width of the imports so that they allign both vertically and horizontally during responsibe viewing
+ 5. Set up the search bar to open a new module that searches for anything in the database
+ 6. Wire up the newstake button. It should be it's own component that i just import
 
 
 */
@@ -21,6 +24,8 @@ import { appName } from "@/lib/utils";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import CompanyDetailsCard from "./_components/_company-details/company-details";
 import { ConvexAiChat } from "@/components/aiChat";
+import EquityPie from "./_components/equity-pie";
+import { EquityBarchart } from "./_components/equity-barchart";
 
 export const metadata: Metadata = {
   title: `${appName} | Dashboard`,
@@ -118,11 +123,22 @@ export default function DashboardPage() {
               <ScrollBar orientation="horizontal" />
             </ScrollArea>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-              <div className="col-span-4">
+              <RecentSales />
+
+              <div className="col-span-4 bg-primary/5 dark:bg-slate-800 overflow-y-auto  rounded-lg shadow-inner dark:bg-background">
+                <div className="flex flex-col items-center justify-center pt-4 pb-2 h-[25rem]">
+                  <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">
+                    Launch Pie
+                  </h2>
+                  <EquityPie />
+                </div>
+              </div>
+              <div className="col-span-4 dark:bg-slate-800 overflow-y-auto bg-primary/5 rounded-lg shadow-inner dark:bg-background">
+                <EquityBarchart />
+              </div>
+              <div className="col-span-3">
                 <CompanyDetailsCard />
               </div>
-
-              <RecentSales />
             </div>
           </div>
         </div>

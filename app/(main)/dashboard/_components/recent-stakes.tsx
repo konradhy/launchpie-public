@@ -102,7 +102,7 @@ export default function Component() {
           <CardTitle>Current Stakes</CardTitle>
           <CardDescription>Stakes that need to be completed </CardDescription>
         </CardHeader>
-        <ScrollArea className=" h-[120px] md:h-[345px] ">
+        <ScrollArea className=" h-[120px] md:h-[345px]  ">
           <CardContent className="grid gap-4">
             {tasks.map((task, index) => (
               <TaskCard key={index} {...task} />

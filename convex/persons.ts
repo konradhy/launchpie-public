@@ -36,6 +36,7 @@ export const create = mutation({
       userId: identity.tokenIdentifier,
       email: args.email,
       companyId: args.companyId,
+      equity: 0,
     });
 
     if (args.bind && args.companyId) {
@@ -86,6 +87,7 @@ export const createMultiple = mutation({
           userId: identity.tokenIdentifier,
           email: person.email,
           companyId: args.companyId,
+          equity: 0,
         });
 
         ids.push(id);

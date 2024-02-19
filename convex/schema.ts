@@ -26,6 +26,7 @@ export default defineSchema({
     registered: v.string(),
     taxId: v.string(),
     riskMultiplier: v.number(),
+    totalPieValue: v.number(),
     files: v.optional(
       //remove next purge
       v.array(
@@ -71,11 +72,12 @@ export default defineSchema({
     updatedAt: v.string(),
     userId: v.string(),
     email: v.string(),
-    linkedUserId: v.optional(v.string()), //it's easier and I am not refactoring at this time
+    linkedUserId: v.optional(v.string()),
     hourlyRate: v.number(),
     role: v.string(),
     profilePicture: v.optional(v.string()),
     companyId: v.id("companies"),
+    equity: v.number(),
   })
     .index("by_user", ["userId"])
     .index("by_linkedUserId", ["linkedUserId"])
@@ -112,7 +114,8 @@ export default defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_company", ["companyId"])
-    .index("by_assignee", ["assignees"]), //not sure if this works with an array
+    .index("by_assignee", ["assignees"]) //not sure if this works with an array
+    .index("by_company_and_date", ["companyId", "updatedAt"]),
 
   notes: defineTable({
     title: v.string(),

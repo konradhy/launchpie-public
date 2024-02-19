@@ -46,6 +46,7 @@ export const create = mutation({
       registered: "Pending",
       taxId: "Pending",
       riskMultiplier: 2,
+      totalPieValue: 0,
     });
 
     return company;
