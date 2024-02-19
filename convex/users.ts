@@ -105,7 +105,6 @@ export const bindUserToCompany = internalMutation({
   handler: async (ctx, args) => {
     //find user by userClerkId
 
-    console.log(args.userClerkId, "here it is ");
     const user = await ctx.db
       .query("users")
       .withIndex("by_token", (q) => q.eq("tokenIdentifier", args.userClerkId))
@@ -119,7 +118,6 @@ export const bindUserToCompany = internalMutation({
     }
     //add companyId to user but only if it's empty
     if (!user.companyId !== undefined) {
-      console.log("entered the company Id");
       await ctx.db.patch(user._id, { companyId: args.companyId });
     }
 
@@ -141,7 +139,7 @@ export const bindUserToCompany = internalMutation({
       if (!company.associatedUsers.includes(args.userClerkId)) {
         //add user Id to a companies associatedUser array
         company.associatedUsers.push(args.userClerkId);
-        console.log("entered the associated users");
+
         await ctx.db.patch(args.companyId, {
           associatedUsers: company.associatedUsers,
         });

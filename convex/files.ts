@@ -1,15 +1,15 @@
-//After we refactor the code base so that launchpad lives alone we can leverage how we used to use Documents and just take their trash page. From there we'll be able to perma delete files and restore them
+//refactor so that files trash works the same as notes trash/archve
 //refactor so that files are stored in a different table
 import { ConvexError, v } from "convex/values";
 import { internalMutation, mutation, query } from "./_generated/server";
 import { Id } from "./_generated/dataModel";
 import { internal } from "./_generated/api";
 import { asyncMap } from "modern-async";
+import { CharacterTextSplitter } from "langchain/text_splitter";
 import {
-  RecursiveCharacterTextSplitter,
-  CharacterTextSplitter,
-} from "langchain/text_splitter";
-import { validateUserAndCompany } from "./helpers/utils";
+  validateUserAndCompany,
+  validateUserAndCompanyMutations,
+} from "./helpers/utils";
 
 export const generateUploadUrl = mutation({
   handler: async (ctx) => {
@@ -36,12 +36,14 @@ export const saveStorageIds = mutation({
     companyId: v.id("companies"),
   },
   handler: async (ctx, args) => {
-    const { identity } = await validateUserAndCompany(ctx, "Files");
+    const { identity } = await validateUserAndCompanyMutations(ctx, "Files");
     //configure to save multiple files
+    //temporarily throw an error if it's not a docx. Maybe do it on frontend?
 
+    //saves the files to the database
     const fileIds = await Promise.all(
       args.uploaded.map((file) =>
-        ctx.db.insert("documents", {
+        ctx.db.insert("files", {
           storageId: file.storageId,
           fileName: file.fileName,
           userId: identity.tokenIdentifier,
@@ -54,8 +56,10 @@ export const saveStorageIds = mutation({
       ),
     );
 
+    //I need to iterate over the files, as it stands right now, the ChatBot will only be trained on the first file that you give it.
     const storageId = args.uploaded[0].storageId;
-    //manual hack was used here for typing fix properly later
+
+    //manual hack was used here for typing fix properly later, see earlier note
     const fileUrl = await ctx.storage.getUrl(storageId as Id<"_storage">);
     if (!fileUrl) {
       throw new ConvexError({
@@ -72,7 +76,8 @@ export const saveStorageIds = mutation({
       summary: "",
       title: args.uploaded[0].fileName,
       uploadedAt: new Date().toISOString(),
-      category: "document",
+      category: "file",
+      companyId: args.companyId,
     });
   },
 });
@@ -82,7 +87,7 @@ export const getSearch = query({
     const { company } = await validateUserAndCompany(ctx, "CompanyInformation");
 
     const companyFiles = await ctx.db
-      .query("documents")
+      .query("files")
       .filter((q) => q.eq(q.field("companyId"), company._id))
       .filter((q) => q.eq(q.field("isArchived"), false))
       .collect();
@@ -94,7 +99,7 @@ export const getSearch = query({
 //this is done wrong. I should find the company using the companyId that's saved in the documents schema
 //then use that to grab the company and check if the user is associated with the company
 export const archive = mutation({
-  args: { id: v.id("documents") },
+  args: { id: v.id("files") },
   handler: async (ctx, args) => {
     await validateUserAndCompany(ctx, "Files");
 
@@ -108,23 +113,23 @@ export const archive = mutation({
 //then use that to grab the company and check if the user is associated with the company
 export const serveFile = query({
   args: {
-    id: v.id("documents"),
+    id: v.id("files"),
   },
   handler: async (ctx, args) => {
     await validateUserAndCompany(ctx, "CompanyInformation");
 
-    const document = await ctx.db.get(args.id);
+    const file = await ctx.db.get(args.id);
 
     //find the file with the storageId
 
-    if (!document) {
+    if (!file) {
       throw new ConvexError({
         message: "File not found",
         severity: "low",
       });
     }
 
-    const url = await ctx.storage.getUrl(document.storageId as Id<"_storage">);
+    const url = await ctx.storage.getUrl(file.storageId as Id<"_storage">);
 
     return url;
   },
@@ -135,12 +140,13 @@ export const chunker = internalMutation({
     text: v.string(),
     args: v.object({
       fileUrl: v.string(),
-      id: v.id("documents"),
+      id: v.id("files"),
       author: v.string(),
       summary: v.string(),
       title: v.string(),
       uploadedAt: v.string(),
       category: v.string(),
+      companyId: v.id("companies"),
     }),
   },
   handler: async (ctx, { text, args }) => {
@@ -171,30 +177,15 @@ export const chunker = internalMutation({
     await asyncMap(chunks, async (chunk: any) => {
       const chunkText = JSON.stringify(chunk);
       await ctx.db.insert("chunks", {
-        documentId: args.id,
+        fileId: args.id,
         text: chunkText,
         embeddingId: null,
+        companyId: args.companyId,
       });
     });
   },
 });
 
-export const saveChunks = internalMutation({
-  args: {
-    chunks: v.string(),
-    id: v.id("documents"),
-  },
-  handler: async (ctx, { chunks, id }) => {
-    console.log("chunks", chunks);
-    await asyncMap(chunks, async (chunk: any) => {
-      console.log("chunk", chunk);
-      // await ctx.db.insert("chunks", {
-      //   documentId: id,
-      //   text: chunk ,
-      //   embeddingId: null,
-      // });
-    });
-  },
-});
+//err what was this doing?
 
 //the only thing that checks if you're authenticated in when you go to the dashboard is the upload files  search thing
