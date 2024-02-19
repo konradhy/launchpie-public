@@ -75,7 +75,6 @@ export default function Onboarding01() {
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
-      console.log("Form data", data);
       const companyId = await create(data);
       toast.success(`${data.companyName} created!`, {
         description: "Your company has been created successfully",

@@ -70,7 +70,6 @@ export const equityBarchart = query({
       .collect();
 
     const groupedTasks = groupTasksByMonthAndCalculateEquity(tasks);
-    console.log(groupedTasks);
 
     return groupedTasks;
   },

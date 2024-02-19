@@ -14,8 +14,7 @@ export const EquityBarchart = () => {
   }
 
   const assigneeLines = transformDataForAssigneeEquity(lineData);
-  console.log("assigneeLines");
-  console.log(assigneeLines);
+
   return (
     <div className=" p-4 rounded-lg shadow-inner ">
       <h1 className="font-semibold text-2xl">Equity Growth</h1>

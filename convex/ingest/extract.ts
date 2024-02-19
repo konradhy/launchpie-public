@@ -5,28 +5,25 @@
 3. We store the text in the vector database (Uthe has changed/latestversion configuration seen in the updateDocument function in the  convex-ai-chat repo willbe useful for when i'm doing notes. Instead of Url, we'll be passing the text along with the file id)
 4. Switch to contextual chunk headers. Ask for guideance in a langchain discord
 */
-import { action, internalAction, internalMutation } from "../_generated/server";
+import { internalAction, internalMutation } from "../_generated/server";
 import { v } from "convex/values";
 import { Id } from "../_generated/dataModel";
-import {
-  RecursiveCharacterTextSplitter,
-  CharacterTextSplitter,
-} from "langchain/text_splitter";
+
 import { internal } from "../_generated/api";
-var docx = require("docx");
+
 var mammoth = require("mammoth");
 import { Buffer } from "buffer";
-import { asyncMap } from "modern-async";
 
 export const extractText = internalAction({
   args: {
     fileUrl: v.string(),
-    id: v.id("documents"),
+    id: v.id("files"),
     author: v.string(),
     summary: v.string(),
     title: v.string(),
     uploadedAt: v.string(),
     category: v.string(),
+    companyId: v.id("companies"),
   },
   handler: async (ctx, args) => {
     const response = await fetch(args.fileUrl);

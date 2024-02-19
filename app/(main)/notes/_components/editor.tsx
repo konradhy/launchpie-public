@@ -96,11 +96,8 @@ const Editor = ({
 
     const { storageId } = await result.json();
 
-    console.log(storageId);
     const imageUrl = await generateImageUrl({ id: storageId });
 
-    console.log(imageUrl);
-    console.log(uploadUrl);
     return imageUrl as any;
   };
 
@@ -286,13 +283,9 @@ const Editor = ({
 
   const replaceAllBlocks = () => {
     if (!liveContent) return;
-    console.log("live automatically");
+
     const blocksToInsert = JSON.parse(liveContent) as PartialBlock[];
 
-    console.log("blocks to insert", blocksToInsert);
-    console.log("editor blocks", editor.topLevelBlocks);
-
-    // console.log("blocks to insert", blocksToInsert);
     removeAllBlocks();
 
     editor.insertBlocks(blocksToInsert, editor.topLevelBlocks[0]);

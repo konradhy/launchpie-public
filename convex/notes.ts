@@ -2,7 +2,10 @@ import { v } from "convex/values";
 
 import { mutation, query } from "./_generated/server";
 import { Doc, Id } from "./_generated/dataModel";
-import { validateUserAndCompany } from "./helpers/utils";
+import {
+  validateUserAndCompany,
+  validateUserAndCompanyMutations,
+} from "./helpers/utils";
 
 export const create = mutation({
   args: {
@@ -10,7 +13,7 @@ export const create = mutation({
     parentNote: v.optional(v.id("notes")),
   },
   handler: async (ctx, args) => {
-    const { identity, company } = await validateUserAndCompany(
+    const { identity, company } = await validateUserAndCompanyMutations(
       ctx,
       "CompanyInformation",
     );
@@ -139,7 +142,6 @@ export const generateImageUrl = mutation({
     }
 
     const imageUrl = await ctx.storage.getUrl(args.id);
-    console.log("imageUrl", imageUrl);
 
     return imageUrl;
   },

@@ -7,7 +7,6 @@ import { EditTaskForm } from "../edit-task-form";
 
 export const EditTaskModal = () => {
   const editTask = useEditTask();
-  console.log(editTask.task);
 
   return (
     <Dialog open={editTask.isOpen} onOpenChange={editTask.onClose}>

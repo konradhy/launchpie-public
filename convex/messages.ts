@@ -2,6 +2,10 @@ import { v } from "convex/values";
 import { mutation } from "./_generated/server";
 import { query } from "./_generated/server";
 import { internal } from "./_generated/api";
+import {
+  validateUserAndCompany,
+  validateUserAndCompanyMutations,
+} from "./helpers/utils";
 
 export const list = query({
   args: {
@@ -21,7 +25,10 @@ export const send = mutation({
     sessionId: v.string(),
   },
   handler: async (ctx, { message, sessionId }) => {
-    console.log("cheese");
+    console.log("send message");
+    const identity = await ctx.auth.getUserIdentity();
+    console.log("identity", identity);
+    const { company } = await validateUserAndCompanyMutations(ctx, "Files");
 
     await ctx.db.insert("messages", {
       isViewer: true,
@@ -30,6 +37,7 @@ export const send = mutation({
     });
     await ctx.scheduler.runAfter(0, internal.serve.answer, {
       sessionId,
+      companyId: company._id,
     });
   },
 });

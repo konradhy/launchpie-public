@@ -26,7 +26,6 @@ export const FileUploadModal = () => {
     try {
       if (!data?._id) return;
 
-      console.log("uploaded", uploaded);
       await saveStorageId({
         companyId: data._id,
         uploaded: uploaded.map((response) => ({
@@ -78,9 +77,7 @@ export const FileUploadModal = () => {
           }}
           subtitle="AI will process these files to improve its understanding of your business"
           multiple
-          onUploadBegin={(fileName: string) => {
-            console.log("File selected for upload:", fileName);
-          }}
+          onUploadBegin={(fileName: string) => {}}
           onUploadComplete={saveAfterUpload}
           onUploadError={(error: unknown) => {
             // Do something with the error.

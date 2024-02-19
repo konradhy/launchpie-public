@@ -22,7 +22,7 @@ import {
 import { Detail } from "./detail";
 import { InfoSection } from "./info-section";
 import { usePersonsDetails } from "@/hooks/use-persons-details";
-import { ConvexAiChat } from "@/components/aiChat";
+import { ConvexAiChat } from "@/app/aiChat";
 import { Button } from "@/components/ui/button";
 import { Doc } from "@/convex/_generated/dataModel";
 

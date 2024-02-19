@@ -31,7 +31,7 @@ import { Separator } from "@/components/ui/separator";
 import { Nav } from "./nav";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useSettings } from "@/hooks/use-settings";
-import { ConvexAiChat } from "@/components/aiChat";
+import { ConvexAiChat } from "@/app/aiChat";
 import { Button } from "@/components/ui/button";
 interface NavLink {
   title: string;

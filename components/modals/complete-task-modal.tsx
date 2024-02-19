@@ -7,7 +7,6 @@ import { CompleteTaskForm } from "../complete-task-form";
 
 export const CompleteTaskModal = () => {
   const completeTask = useCompleteTask();
-  console.log(completeTask.task);
 
   return (
     <Dialog open={completeTask.isOpen} onOpenChange={completeTask.onClose}>

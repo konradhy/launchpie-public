@@ -1,6 +1,9 @@
 import { internalMutation, mutation, query } from "./_generated/server";
 import { ConvexError, v } from "convex/values";
-import { validateUserAndCompany } from "./helpers/utils";
+import {
+  validateUserAndCompany,
+  validateUserAndCompanyMutations,
+} from "./helpers/utils";
 import { Id } from "./_generated/dataModel";
 import { internal } from "./_generated/api";
 import { getAll } from "convex-helpers/server/relationships";
@@ -59,7 +62,7 @@ export const create = mutation({
     companyId: v.id("companies"),
   },
   handler: async (ctx, args) => {
-    const { user, identity, company } = await validateUserAndCompany(
+    const { user, identity, company } = await validateUserAndCompanyMutations(
       ctx,
       "CompanyInformation",
     );
@@ -221,7 +224,6 @@ export const completeTask = mutation({
         totalPieValue: company.totalPieValue,
       },
     );
-    console.log("Theoretical Value: ", tv);
 
     await ctx.db.patch(args.taskId, {
       taskState: args.taskState,

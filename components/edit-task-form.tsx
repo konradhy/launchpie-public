@@ -114,7 +114,6 @@ export const EditTaskForm = ({ task }: EditTaskFormProps) => {
   });
 
   const isLoading = form.formState.isSubmitting;
-  console.log(taskId);
 
   const onSubmit = async (data: z.infer<typeof taskSchema>) => {
     if (taskId === undefined) {
@@ -122,7 +121,6 @@ export const EditTaskForm = ({ task }: EditTaskFormProps) => {
       return;
     }
     try {
-      console.log("testing");
       await updateTask({ ...data, taskId });
       toast.success("Task successfully created");
 

@@ -10,12 +10,14 @@ import {
 } from "../_generated/server";
 import { paginate } from "../helpers";
 
+//embedd all is only embeding documents that are named "documents" this should be considered during the refactorign to name this files.
+//We'll also need similar functions for the notes and the tasks.
 export const embedAll = internalAction({
   args: {},
   handler: async (ctx) => {
-    await paginate(ctx, "documents", 20, async (documents) => {
+    await paginate(ctx, "files", 20, async (files) => {
       await ctx.runAction(internal.ingest.embed.embedList, {
-        documentIds: documents.map((doc) => doc._id),
+        fileIds: files.map((file) => file._id),
       });
     });
   },
@@ -23,13 +25,13 @@ export const embedAll = internalAction({
 
 export const embedList = internalAction({
   args: {
-    documentIds: v.array(v.id("documents")),
+    fileIds: v.array(v.id("files")),
   },
-  handler: async (ctx, { documentIds }) => {
+  handler: async (ctx, { fileIds }) => {
     const chunks = (
-      await asyncMap(documentIds, (documentId) =>
+      await asyncMap(fileIds, (fileId) =>
         ctx.runQuery(internal.ingest.embed.chunksNeedingEmbedding, {
-          documentId,
+          fileId,
         }),
       )
     ).flat();
@@ -37,19 +39,21 @@ export const embedList = internalAction({
     const embeddings = await embedTexts(chunks.map((chunk) => chunk.text));
     await asyncMap(embeddings, async (embedding, i) => {
       const { _id: chunkId } = chunks[i];
+      const { companyId } = chunks[i];
       await ctx.runMutation(internal.ingest.embed.addEmbedding, {
         chunkId,
         embedding,
+        companyId,
       });
     });
   },
 });
 
 export const chunksNeedingEmbedding = internalQuery(
-  async (ctx, { documentId }: { documentId: Id<"documents"> }) => {
+  async (ctx, { fileId }: { fileId: Id<"files"> }) => {
     const chunks = await ctx.db
       .query("chunks")
-      .withIndex("byDocumentId", (q) => q.eq("documentId", documentId))
+      .withIndex("byFileId", (q) => q.eq("fileId", fileId))
       .collect();
     return chunks.filter((chunk) => chunk.embeddingId === null);
   },
@@ -58,11 +62,20 @@ export const chunksNeedingEmbedding = internalQuery(
 export const addEmbedding = internalMutation(
   async (
     ctx,
-    { chunkId, embedding }: { chunkId: Id<"chunks">; embedding: number[] },
+    {
+      chunkId,
+      embedding,
+      companyId,
+    }: {
+      chunkId: Id<"chunks">;
+      embedding: number[];
+      companyId: Id<"companies">;
+    },
   ) => {
     const embeddingId = await ctx.db.insert("embeddings", {
       embedding,
       chunkId,
+      companyId,
     });
     await ctx.db.patch(chunkId, { embeddingId });
   },

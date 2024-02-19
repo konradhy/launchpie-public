@@ -1,5 +1,6 @@
 "use client";
 //further divide by category. to get a truly polished look
+//might be easier to have an outer pie chart just divided by
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Spinner } from "@/components/spinner";

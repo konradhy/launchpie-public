@@ -18,7 +18,6 @@ export default function Onboarding04() {
   const companyId = searchParams.get("companyId") as Id<"companies">;
   const company = useQuery(api.companies.getById, { id: companyId });
 
-  console.log(company?.companyName);
   return (
     <main className="bg-white dark:bg-slate-900">
       <div className="relative flex">

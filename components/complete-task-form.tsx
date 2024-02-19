@@ -87,7 +87,6 @@ export const CompleteTaskForm = ({ task }: CompleteTaskFormProps) => {
   });
 
   const isLoading = form.formState.isSubmitting;
-  console.log(taskId);
 
   const onSubmit = async (data: z.infer<typeof taskSchema>) => {
     if (taskId === undefined) {
@@ -96,7 +95,6 @@ export const CompleteTaskForm = ({ task }: CompleteTaskFormProps) => {
     }
     try {
       if (!data.taskState) {
-        console.log("Task is not completed");
         toast.message("You have not completed the task so nothing was saved");
         completeTask.onClose();
         return;

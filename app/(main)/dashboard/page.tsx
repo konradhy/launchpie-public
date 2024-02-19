@@ -23,7 +23,7 @@ import EquityCard from "./_components/equity-card";
 import { appName } from "@/lib/utils";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import CompanyDetailsCard from "./_components/_company-details/company-details";
-import { ConvexAiChat } from "@/components/aiChat";
+import { ConvexAiChat } from "@/app/aiChat";
 import EquityPie from "./_components/equity-pie";
 import { EquityBarchart } from "./_components/equity-barchart";
 

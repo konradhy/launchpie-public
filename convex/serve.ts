@@ -16,8 +16,9 @@ const OPENAI_MODEL = "gpt-3.5-turbo";
 export const answer = internalAction({
   args: {
     sessionId: v.string(),
+    companyId: v.id("companies"),
   },
-  handler: async (ctx, { sessionId }) => {
+  handler: async (ctx, { sessionId, companyId }) => {
     const messages = await ctx.runQuery(internal.serve.getMessages, {
       sessionId,
     });
@@ -25,9 +26,11 @@ export const answer = internalAction({
 
     const [embedding] = await embedTexts([lastUserMessage]);
 
+    // limit to only embeddings that have the right companyId
     const searchResults = await ctx.vectorSearch("embeddings", "byEmbedding", {
       vector: embedding,
       limit: 8,
+      filter: (q) => q.eq("companyId", companyId),
     });
 
     const relevantDocuments = await ctx.runQuery(internal.serve.getChunks, {

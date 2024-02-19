@@ -45,8 +45,6 @@ export function DataTableRowActions<TData>({
     return <Skeleton />;
   }
 
-  console.log(task.label);
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
