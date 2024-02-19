@@ -27,20 +27,7 @@ export default defineSchema({
     taxId: v.string(),
     riskMultiplier: v.number(),
     totalPieValue: v.number(),
-    files: v.optional(
-      //remove next purge
-      v.array(
-        v.object({
-          storageId: v.string(),
-          fileName: v.string(),
-          userId: v.string(),
-          createdAt: v.string(),
-          updatedAt: v.string(),
-          isArchived: v.boolean(),
-          isPublished: v.boolean(),
-        }),
-      ),
-    ),
+
     shareholders: v.optional(
       v.array(
         v.object({
@@ -142,7 +129,7 @@ export default defineSchema({
     text: v.string(),
   }).index("bySessionId", ["sessionId"]),
 
-  documents: defineTable({
+  files: defineTable({
     url: v.optional(v.string()),
     text: v.optional(v.string()),
     storageId: v.string(),
@@ -158,21 +145,24 @@ export default defineSchema({
     .index("byCompanyId", ["companyId"]),
 
   chunks: defineTable({
-    documentId: v.id("documents"),
+    fileId: v.id("files"),
     text: v.string(),
     embeddingId: v.union(v.id("embeddings"), v.null()),
+    companyId: v.id("companies"),
   })
-    .index("byDocumentId", ["documentId"])
+    .index("byFileId", ["fileId"])
     .index("byEmbeddingId", ["embeddingId"]),
 
   // the actual embeddings
   embeddings: defineTable({
     embedding: v.array(v.number()),
     chunkId: v.id("chunks"),
+    companyId: v.id("companies"),
   })
     .index("byChunkId", ["chunkId"])
     .vectorIndex("byEmbedding", {
       vectorField: "embedding",
       dimensions: 1536,
+      filterFields: ["companyId"],
     }),
 });
