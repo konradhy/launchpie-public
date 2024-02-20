@@ -72,7 +72,6 @@ export async function validateUserAndCompanyMutations(
   identity: UserIdentity;
 }> {
   const identity = await ctx.auth.getUserIdentity();
-  console.log("identity", identity);
 
   if (!identity) {
     throw new ConvexError({

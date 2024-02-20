@@ -77,6 +77,7 @@ export default defineSchema({
     dueDate: v.string(),
     estimatedTime: v.number(),
     actualTime: v.optional(v.number()),
+    text: v.optional(v.string()),
     taskState: v.union(
       v.literal("notStarted"),
       v.literal("inProgress"),
@@ -115,6 +116,7 @@ export default defineSchema({
     isPublished: v.boolean(),
     editors: v.optional(v.array(v.string())),
     companyId: v.id("companies"),
+    text: v.optional(v.string()),
   })
     .index("by_user", ["userId"])
     .index("by_user_parent", ["userId", "parentNote"])
@@ -145,12 +147,16 @@ export default defineSchema({
     .index("byCompanyId", ["companyId"]),
 
   chunks: defineTable({
-    fileId: v.id("files"),
+    fileId: v.optional(v.id("files")),
+    noteId: v.optional(v.id("notes")), //rename to noteId and update index
+    taskId: v.optional(v.id("tasks")),
     text: v.string(),
     embeddingId: v.union(v.id("embeddings"), v.null()),
     companyId: v.id("companies"),
   })
     .index("byFileId", ["fileId"])
+    .index("byNoteId", ["noteId"])
+    .index("byTaskId", ["taskId"])
     .index("byEmbeddingId", ["embeddingId"]),
 
   // the actual embeddings
@@ -158,8 +164,14 @@ export default defineSchema({
     embedding: v.array(v.number()),
     chunkId: v.id("chunks"),
     companyId: v.id("companies"),
+    noteId: v.optional(v.id("notes")),
+    taskId: v.optional(v.id("tasks")),
+    fileId: v.optional(v.id("files")),
   })
     .index("byChunkId", ["chunkId"])
+    .index("byNoteId", ["noteId"])
+    .index("byTaskId", ["taskId"])
+    .index("byFileId", ["fileId"])
     .vectorIndex("byEmbedding", {
       vectorField: "embedding",
       dimensions: 1536,

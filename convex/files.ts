@@ -69,7 +69,7 @@ export const saveStorageIds = mutation({
     }
 
     //call internal action, passing the files one at a time
-    await ctx.scheduler.runAfter(0, internal.ingest.extract.extractText, {
+    await ctx.scheduler.runAfter(0, internal.ingest.extract.extractTextFile, {
       fileUrl: fileUrl,
       id: fileIds[0],
       author: identity.name || "",
@@ -155,6 +155,26 @@ export const chunker = internalMutation({
       chunkOverlap: 200,
     });
 
+    //The other chunkers will need this step
+
+    // const latestVersion = await ctx.db
+    // .query("files")
+    // .withIndex("by_fileId", (q) => q.eq("fileId", args.id))
+    // .order("desc")
+    // .first()
+
+    //this will grab the latest note, and on it it will have a field called text that came from ???the chunker ???
+    // if it has changed then we will save the new text into the document. Since we're comparing it to ifself, there won't be parsing trouble
+    // after saving it to itself we call the chynker. And make new chunks.
+    //Then we save the chunks to the database.
+    // If i make a single change, then new chunks will be made.
+    //to fix this is should delete the old chunks with the matching documentId,
+    // it doesn't work. It needs to be a button that you press to update the document's chunks. When that is clicked, we just treat it like a file
+    // We don't want to be extracting text, etc at each key stroke.
+    // Click button that is like updateNote, but is instead updateChuynks. Doesn't really solve stake data issue
+
+    //end
+
     const chunks = await splitter.createDocuments(
       [text],
       [
@@ -185,7 +205,3 @@ export const chunker = internalMutation({
     });
   },
 });
-
-//err what was this doing?
-
-//the only thing that checks if you're authenticated in when you go to the dashboard is the upload files  search thing

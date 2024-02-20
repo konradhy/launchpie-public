@@ -7,6 +7,8 @@ import {
 import { Id } from "./_generated/dataModel";
 import { internal } from "./_generated/api";
 import { getAll } from "convex-helpers/server/relationships";
+import { CharacterTextSplitter } from "langchain/text_splitter";
+import { asyncMap } from "modern-async";
 
 //get task by id
 export const getTaskById = query({
@@ -35,7 +37,7 @@ export const create = mutation({
   args: {
     title: v.optional(v.string()),
     description: v.string(),
-    assignees: v.optional(v.array(v.string())),
+    assignees: v.optional(v.array(v.string())), //shouldn't be optional
     dueDate: v.optional(v.string()),
     estimatedTime: v.number(),
     taskState: v.optional(
@@ -94,6 +96,19 @@ export const create = mutation({
       priority: args.priority || "low",
       category: args.category || "uncategorized",
       isArchived: false,
+    });
+
+    await ctx.scheduler.runAfter(0, internal.ingest.extract.extractTextTask, {
+      args: {
+        ...args,
+        id: taskId,
+        assignees:
+          args.assignees && args.assignees.length > 0
+            ? args.assignees.map(
+                (assignee: string) => assignee as Id<"persons">,
+              )
+            : [user.linkedPersonId as Id<"persons">],
+      },
     });
     return taskId;
   },
@@ -176,6 +191,16 @@ export const update = mutation({
       category: args.category,
     });
 
+    await ctx.scheduler.runAfter(0, internal.ingest.extract.extractTextTask, {
+      args: {
+        ...args,
+        id: args.taskId,
+        companyId: company._id,
+      },
+    });
+
+    //delete stale embeddings and chunks
+
     return updatedTask;
   },
 });
@@ -188,6 +213,7 @@ export const completeTask = mutation({
     actualTime: v.number(),
     meetingAgendaFlag: v.optional(v.boolean()),
     equityValue: v.optional(v.number()), // remove
+
     reviewStatus: v.optional(
       v.union(
         v.literal("notFlagged"),
@@ -233,6 +259,36 @@ export const completeTask = mutation({
       actualTime: args.actualTime,
       meetingAgendaFlag: args.meetingAgendaFlag,
     });
+
+    const updatedTask = await ctx.db.get(args.taskId);
+    //equity value isn't being saved yet.
+    if (!updatedTask) {
+      throw new ConvexError("Task not found, even though it just updated");
+    }
+    const {
+      _id,
+      _creationTime,
+      createdAt,
+      isArchived,
+      text,
+      updatedAt,
+      updatedBy,
+      userId,
+      ...rest
+    } = updatedTask;
+
+    // instead of passing in these args we grab the tasks full details from the db, that we we can pass max info.
+    //also we don't need to check if there has been a change. If you ran from complete then it's done
+    //We also need to delete the embeddings who's task id is the same as the task id being updated
+    await ctx.scheduler.runAfter(0, internal.ingest.extract.extractTextTask, {
+      args: {
+        ...rest,
+
+        id: args.taskId,
+        companyId: company._id,
+      },
+    });
+    console.log("Ran it and done the scheudler");
   },
 });
 
@@ -297,5 +353,91 @@ export const calculateTheoreticalValue = internalMutation({
         });
       }),
     );
+  },
+});
+
+export const chunker = internalMutation({
+  args: {
+    text: v.string(),
+    args: v.object({
+      id: v.id("tasks"),
+      title: v.optional(v.string()),
+      description: v.optional(v.string()),
+      assignees: v.optional(v.array(v.string())),
+      dueDate: v.optional(v.string()),
+      estimatedTime: v.optional(v.number()),
+      taskState: v.optional(
+        v.union(
+          v.literal("notStarted"),
+          v.literal("inProgress"),
+          v.literal("completed"),
+        ),
+      ),
+      reviewStatus: v.optional(
+        v.union(
+          v.literal("notFlagged"),
+          v.literal("flagged"),
+          v.literal("approved"),
+        ),
+      ),
+      meetingAgendaFlag: v.optional(v.boolean()),
+      actualTime: v.optional(v.number()),
+      equityValue: v.optional(v.number()),
+      notes: v.optional(v.string()),
+      priority: v.optional(
+        v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
+      ),
+      category: v.optional(v.string()),
+      companyId: v.id("companies"),
+    }),
+  },
+  handler: async (ctx, { text, args }) => {
+    const latestVersion = await ctx.db.get(args.id);
+
+    console.log("The lst text said this");
+    console.log(latestVersion?.text);
+
+    console.log("The new text says this");
+    console.log(text);
+    const hasChanged = latestVersion === null || latestVersion.text !== text;
+    if (hasChanged) {
+      await ctx.db.patch(args.id, { text });
+      console.log(text);
+
+      const splitter = new CharacterTextSplitter({
+        chunkSize: 1536,
+        chunkOverlap: 200,
+      });
+
+      const chunks = await splitter.createDocuments(
+        [text],
+        [
+          {
+            //summary: args.summary,
+            title: args.title,
+            assignees: args.assignees,
+            dueDate: args.dueDate,
+            id: args.id,
+            category: args.category,
+            priority: args.priority,
+          },
+        ],
+
+        {
+          chunkHeader: `This is a task: ${args.title}  \n`,
+          appendChunkOverlapHeader: true,
+        },
+      );
+
+      await asyncMap(chunks, async (chunk: any) => {
+        const chunkText = JSON.stringify(chunk);
+        await ctx.db.insert("chunks", {
+          taskId: args.id,
+          text: chunkText,
+          embeddingId: null,
+          companyId: args.companyId,
+        });
+      });
+    }
   },
 });
