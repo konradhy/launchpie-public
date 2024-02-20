@@ -26,11 +26,11 @@ export const SearchCommand = () => {
   //const documents = useQuery(api.documents.getSearch);
   const files = useQuery(api.files.getSearch);
   const archiveFile = useMutation(api.files.archive);
-  const [isDocumentId, setIsDocumentId] = useState<Id<"documents">>();
+  const [isFileId, setIsFileId] = useState<Id<"files">>();
 
   const serveFile = useQuery(
     api.files.serveFile,
-    isDocumentId !== undefined ? { id: isDocumentId } : "skip",
+    isFileId !== undefined ? { id: isFileId } : "skip",
   );
   const [isMounted, setIsMounted] = useState(false);
 
@@ -59,20 +59,20 @@ export const SearchCommand = () => {
     onClose();
   };
 
-  const onDelete = (id: Id<"documents">) => {
+  const onDelete = (id: Id<"files">) => {
     archiveFile({ id });
   };
 
-  const onSelectFile = (id: Id<"documents">) => {
-    setIsDocumentId(id);
+  const onSelectFile = (id: Id<"files">) => {
+    setIsFileId(id);
   };
 
   useEffect(() => {
-    if (isDocumentId !== "" && serveFile !== undefined && serveFile !== null) {
+    if (isFileId !== "" && serveFile !== undefined && serveFile !== null) {
       window.open(serveFile, "_blank");
       onClose();
     }
-  }, [isDocumentId, serveFile, router, onClose]);
+  }, [isFileId, serveFile, router, onClose]);
 
   if (!isMounted) {
     return null;
@@ -83,41 +83,21 @@ export const SearchCommand = () => {
       <CommandInput placeholder={`Search ${user?.fullName}'s workspace...`} />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
-        {/* <CommandGroup heading="Notes">
-          {documents?.map((document) => (
-            <CommandItem
-              key={document._id}
-              value={`${document._id}-${document.title}`}
-              title={document.title}
-              onSelect={() => onSelect(document._id)}
-            >
-              {document.icon ? (
-                <p className="mr-2 text-[18px]">{document.icon}</p>
-              ) : (
-                <File className="mr-2 h-4 w-4" />
-              )}
-              <span>{document.title}</span>
-            </CommandItem>
-          ))}
-        </CommandGroup> */}
 
         <CommandGroup heading="Uploaded Files">
-          {files?.map((document) => (
+          {files?.map((file) => (
             <CommandItem
-              key={document._id}
-              value={`${document._id}-${document.fileName}`}
-              title={document.fileName}
+              key={file._id}
+              value={`${file._id}-${file.fileName}`}
+              title={file.fileName}
               className="flex justify-between"
             >
-              <span
-                onClick={() => onSelectFile(document._id)}
-                className="truncate"
-              >
-                {document.fileName}
+              <span onClick={() => onSelectFile(file._id)} className="truncate">
+                {file.fileName}
               </span>
               <div>
                 <Trash
-                  onClick={() => onDelete(document._id)}
+                  onClick={() => onDelete(file._id)}
                   className=" h-2 w-2 hover:text-red-500"
                 />
               </div>
