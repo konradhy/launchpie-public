@@ -1,11 +1,10 @@
 //refactor so that files trash works the same as notes trash/archve
 //refactor so that files are stored in a different table
 import { ConvexError, v } from "convex/values";
-import { internalMutation, mutation, query } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { Id } from "./_generated/dataModel";
 import { internal } from "./_generated/api";
-import { asyncMap } from "modern-async";
-import { CharacterTextSplitter } from "langchain/text_splitter";
+
 import {
   validateUserAndCompany,
   validateUserAndCompanyMutations,
@@ -116,8 +115,7 @@ export const serveFile = query({
     id: v.id("files"),
   },
   handler: async (ctx, args) => {
-    await validateUserAndCompany(ctx, "CompanyInformation");
-
+    const { company } = await validateUserAndCompany(ctx, "CompanyInformation");
     const file = await ctx.db.get(args.id);
 
     //find the file with the storageId
@@ -128,80 +126,16 @@ export const serveFile = query({
         severity: "low",
       });
     }
+    if (file.companyId !== company._id) {
+      throw new ConvexError({
+        message:
+          "There is a mismatch between your company and the file's company",
+        severity: "low",
+      });
+    }
 
     const url = await ctx.storage.getUrl(file.storageId as Id<"_storage">);
 
     return url;
-  },
-});
-
-export const chunker = internalMutation({
-  args: {
-    text: v.string(),
-    args: v.object({
-      fileUrl: v.string(),
-      id: v.id("files"),
-      author: v.string(),
-      summary: v.string(),
-      title: v.string(),
-      uploadedAt: v.string(),
-      category: v.string(),
-      companyId: v.id("companies"),
-    }),
-  },
-  handler: async (ctx, { text, args }) => {
-    const splitter = new CharacterTextSplitter({
-      chunkSize: 1536,
-      chunkOverlap: 200,
-    });
-
-    //The other chunkers will need this step
-
-    // const latestVersion = await ctx.db
-    // .query("files")
-    // .withIndex("by_fileId", (q) => q.eq("fileId", args.id))
-    // .order("desc")
-    // .first()
-
-    //this will grab the latest note, and on it it will have a field called text that came from ???the chunker ???
-    // if it has changed then we will save the new text into the document. Since we're comparing it to ifself, there won't be parsing trouble
-    // after saving it to itself we call the chynker. And make new chunks.
-    //Then we save the chunks to the database.
-    // If i make a single change, then new chunks will be made.
-    //to fix this is should delete the old chunks with the matching documentId,
-    // it doesn't work. It needs to be a button that you press to update the document's chunks. When that is clicked, we just treat it like a file
-    // We don't want to be extracting text, etc at each key stroke.
-    // Click button that is like updateNote, but is instead updateChuynks. Doesn't really solve stake data issue
-
-    //end
-
-    const chunks = await splitter.createDocuments(
-      [text],
-      [
-        {
-          summary: args.summary,
-          title: args.title,
-          author: args.author,
-          uploadedAt: args.uploadedAt,
-          id: args.id,
-          category: args.category,
-        },
-      ],
-
-      {
-        chunkHeader: `Document Title: ${args.title}  \n`,
-        appendChunkOverlapHeader: true,
-      },
-    );
-
-    await asyncMap(chunks, async (chunk: any) => {
-      const chunkText = JSON.stringify(chunk);
-      await ctx.db.insert("chunks", {
-        fileId: args.id,
-        text: chunkText,
-        embeddingId: null,
-        companyId: args.companyId,
-      });
-    });
   },
 });

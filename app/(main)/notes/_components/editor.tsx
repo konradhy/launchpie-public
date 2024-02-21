@@ -48,7 +48,6 @@ import "@blocknote/core/style.css";
 import "../_components/notes.css"; //debug
 import { useParams } from "next/navigation";
 
-//import { useEdgeStore } from "@/lib/edgestore";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";

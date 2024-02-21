@@ -2,10 +2,7 @@ import { v } from "convex/values";
 import { mutation } from "./_generated/server";
 import { query } from "./_generated/server";
 import { internal } from "./_generated/api";
-import {
-  validateUserAndCompany,
-  validateUserAndCompanyMutations,
-} from "./helpers/utils";
+import { validateUserAndCompanyMutations } from "./helpers/utils";
 
 export const list = query({
   args: {

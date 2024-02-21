@@ -17,8 +17,10 @@ import type {
 import type * as companies from "../companies.js";
 import type * as equityPie from "../equityPie.js";
 import type * as files from "../files.js";
+import type * as helpers_ingestHelpers from "../helpers/ingestHelpers.js";
 import type * as helpers_utils from "../helpers/utils.js";
 import type * as helpers from "../helpers.js";
+import type * as ingest_chunkers from "../ingest/chunkers.js";
 import type * as ingest_embed from "../ingest/embed.js";
 import type * as ingest_extract from "../ingest/extract.js";
 import type * as messages from "../messages.js";
@@ -40,8 +42,10 @@ declare const fullApi: ApiFromModules<{
   companies: typeof companies;
   equityPie: typeof equityPie;
   files: typeof files;
+  "helpers/ingestHelpers": typeof helpers_ingestHelpers;
   "helpers/utils": typeof helpers_utils;
   helpers: typeof helpers;
+  "ingest/chunkers": typeof ingest_chunkers;
   "ingest/embed": typeof ingest_embed;
   "ingest/extract": typeof ingest_extract;
   messages: typeof messages;

@@ -2,15 +2,15 @@
 
 import { internalAction, internalMutation } from "../_generated/server";
 import { v } from "convex/values";
-import { Id } from "../_generated/dataModel";
-
 import { internal } from "../_generated/api";
-
-var mammoth = require("mammoth");
+var mammoth = require("mammoth"); //because of the convex environment realities
 import { Buffer } from "buffer";
+import {
+  generateTaskNarrative,
+  parseTextFromJSON,
+} from "../helpers/ingestHelpers";
 
 export const extractTextFile = internalAction({
-  //their fitchSingle
   args: {
     fileUrl: v.string(),
     id: v.id("files"),
@@ -30,7 +30,7 @@ export const extractTextFile = internalAction({
     const result = await mammoth.extractRawText({ buffer });
     const text = result.value;
 
-    await ctx.runMutation(internal.files.chunker, {
+    await ctx.runMutation(internal.ingest.chunkers.fileChunker, {
       text: text,
       args: args,
     });
@@ -53,7 +53,7 @@ export const extractTextNote = internalAction({
   handler: async (ctx, args) => {
     const extractedTexts = parseTextFromJSON(args.content);
 
-    await ctx.runMutation(internal.notes.chunker, {
+    await ctx.runMutation(internal.ingest.chunkers.noteChunker, {
       text: extractedTexts.join("\n"),
       args: args,
     });
@@ -61,87 +61,6 @@ export const extractTextNote = internalAction({
     console.log("extractTextNote", extractedTexts);
   },
 });
-
-function parseTextFromJSON(jsonString: string) {
-  const parsedData = JSON.parse(jsonString);
-  const texts: string[] = [];
-
-  parsedData.forEach(
-    (item: { content?: { type?: string; text?: string }[] }) => {
-      if (item.content && item.content.length > 0) {
-        item.content.forEach((contentItem) => {
-          if (contentItem.type === "text" && contentItem.text) {
-            texts.push(contentItem.text.trim());
-          }
-        });
-      }
-    },
-  );
-
-  return texts;
-}
-
-interface TaskArgs {
-  title?: string;
-  description?: string;
-  dueDate?: string;
-  estimatedTime?: number;
-  taskState?: "notStarted" | "inProgress" | "completed";
-  reviewStatus?: "notFlagged" | "flagged" | "approved";
-  meetingAgendaFlag?: boolean;
-  equityValue?: number;
-  notes?: string;
-  priority?: "low" | "medium" | "high";
-  category?: string;
-  assignees?: Id<"persons">[];
-  actualTime?: number;
-}
-
-function generateTaskNarrative(taskArgs: TaskArgs): string {
-  let narrative = "Task Details:\n";
-
-  if (taskArgs.title) {
-    narrative += `- Title: ${taskArgs.title}\n`;
-  }
-  if (taskArgs.description) {
-    narrative += `- Description: ${taskArgs.description}\n`;
-  }
-  if (taskArgs.dueDate) {
-    narrative += `- Due Date: ${taskArgs.dueDate}\n`;
-  }
-  if (taskArgs.estimatedTime !== undefined) {
-    narrative += `- Estimated Time: ${taskArgs.estimatedTime} hours\n`;
-  }
-  if (taskArgs.taskState) {
-    narrative += `- Task State. This is important. It's how we know if the task is done: ${taskArgs.taskState}\n`;
-  }
-  if (taskArgs.reviewStatus) {
-    narrative += `- Review Status.: ${taskArgs.reviewStatus}\n`;
-  }
-  if (taskArgs.meetingAgendaFlag !== undefined) {
-    narrative += `- Meeting Agenda Flag: ${taskArgs.meetingAgendaFlag ? "This should be included as an action point in the next meeting" : "No"}\n`;
-  }
-  if (taskArgs.equityValue !== undefined) {
-    narrative += `- Equity Value: $${taskArgs.equityValue}\n`;
-  }
-  if (taskArgs.notes) {
-    narrative += `- Notes: ${taskArgs.notes}\n`;
-  }
-  if (taskArgs.priority) {
-    narrative += `- Priority: ${taskArgs.priority}\n`;
-  }
-  if (taskArgs.category) {
-    narrative += `- Category: ${taskArgs.category}\n`;
-  }
-  if (taskArgs.assignees) {
-    narrative += `- The following people are assigned to this task: ${taskArgs.assignees}\n`;
-  }
-  if (taskArgs.actualTime) {
-    narrative += `- It took this many hours to complete the task: ${taskArgs.actualTime}\n`;
-  }
-
-  return narrative;
-}
 
 export const extractTextTask = internalAction({
   args: {
@@ -181,7 +100,7 @@ export const extractTextTask = internalAction({
     const taskNarrative = generateTaskNarrative(args);
 
     console.log("we re updating");
-    await ctx.runMutation(internal.tasks.chunker, {
+    await ctx.runMutation(internal.ingest.chunkers.taskChunker, {
       text: taskNarrative,
       args: args,
     });
