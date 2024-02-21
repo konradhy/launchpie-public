@@ -7,11 +7,11 @@ import {
   internalMutation,
   internalQuery,
 } from "./_generated/server";
-import { embedTexts } from "./ingest/embed";
+import { embedTexts } from "./helpers/ingestHelpers";
 import { internal } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
 
-const OPENAI_MODEL = "gpt-3.5-turbo";
+const OPENAI_MODEL = "gpt-3.5-turbo"; // switch to gpt4 for presentation
 
 export const answer = internalAction({
   args: {
@@ -50,7 +50,7 @@ export const answer = internalAction({
           {
             role: "system",
             content:
-              "Answer the user question based on the provided documents " +
+              "Answer the user question based on the provided documents. These documents will be from the tasks database, the upload database or the notes database. Check the heading to know which one.  " +
               "or report that the question cannot be answered based on " +
               "these documents. Keep the answer informative but brief, " +
               "do not enumerate all possibilities.",
@@ -79,7 +79,7 @@ export const answer = internalAction({
     } catch (error: any) {
       await ctx.runMutation(internal.serve.updateBotMessage, {
         messageId,
-        text: "I cannot reply at this time. Reach out to the team on Discord",
+        text: "I think I'm sick. I can't respond right now. Please reach out to support at support@launchpie.com",
       });
       throw error;
     }
