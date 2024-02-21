@@ -3,23 +3,12 @@ import * as React from "react";
 import {
   Bot,
   ClipboardList,
-  File,
   Folder,
   Home,
-  Inbox,
-  MessagesSquare,
   NotebookPen,
-  PenBox,
   PenLine,
   Plus,
-  PlusCircle,
-  PlusSquare,
-  Search,
-  Send,
-  ShoppingCart,
-  Trash2,
   UploadCloud,
-  Users2,
 } from "lucide-react";
 
 import { AccountSwitcher } from "./account-switcher";
@@ -28,8 +17,7 @@ import { Nav } from "./nav";
 
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   ResizableHandle,

@@ -113,3 +113,49 @@ export async function validateUserAndCompanyMutations(
 
   return { user, company, identity };
 }
+
+
+
+export async function validateNoteAccessMutation(
+  id: Id<"notes">,
+  company: Doc<"companies">,
+  ctx: GenericMutationCtx<DataModel>
+) {
+  const note = await ctx.db.get(id);
+  if (!note) {
+    throw new ConvexError({
+      message: "Note not found",
+      severity: "low",
+    });
+  }
+
+  if (note.companyId !== company._id) {
+    throw new ConvexError({
+      message: "Unauthorized to view this note. Company mismatch",
+      severity: "low",
+    });
+  }
+  return note;
+}
+
+export async function validateNoteAccess(
+  id: Id<"notes">,
+  company: Doc<"companies">,
+  ctx: GenericQueryCtx<DataModel>
+) {
+  const note = await ctx.db.get(id);
+  if (!note) {
+    throw new ConvexError({
+      message: "Note not found",
+      severity: "low",
+    });
+  }
+
+  if (note.companyId !== company._id) {
+    throw new ConvexError({
+      message: "Unauthorized to view this note. Company mismatch",
+      severity: "low",
+    });
+  }
+  return note;
+}

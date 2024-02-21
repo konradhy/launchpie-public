@@ -142,7 +142,7 @@ const NoteIdPage = ({ params }: NoteIdPageProps) => {
   //figure out the cover ts error
   return (
     <div className="pb-40 bg-white dark:bg-[#1F1F1F]  h-screen">
-      {/* <Cover url={note.coverImage} /> */}
+      <Cover url={note.coverImage} />
       <Button onClick={onSave()}>Save</Button>
       <div
         ref={ref}

@@ -120,9 +120,10 @@ export default defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_user_parent", ["userId", "parentNote"])
+    .index("by_company", ["companyId"])
     .searchIndex("search_content", {
       searchField: "content",
-      filterFields: ["userId", "isArchived", "isPublished"],
+      filterFields: ["userId", "isArchived", "isPublished", "companyId"],
     }),
 
   messages: defineTable({

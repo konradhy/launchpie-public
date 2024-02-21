@@ -9,6 +9,7 @@ import { NewTaskModal } from "../modals/new-task-modal";
 import { SettingsModal } from "../modals/settings-modal";
 import { EditTaskModal } from "../modals/edit-task-modal";
 import { CompleteTaskModal } from "../modals/complete-task-modal";
+import { CoverImageModal } from "../modals/cover-image-modal";
 
 export const ModalProvider = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -21,9 +22,9 @@ export const ModalProvider = () => {
   return (
     <>
       {/* 
-      <CoverImageModal />
       <CharacterImageModal />
        */}
+      <CoverImageModal />
       <SettingsModal />
       <FileUploadModal />
       <NewTaskModal />

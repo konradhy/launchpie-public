@@ -3,8 +3,78 @@ import { ConvexError, v } from "convex/values";
 import { internalMutation, mutation, query } from "./_generated/server";
 import { asyncMap } from "modern-async";
 import { CharacterTextSplitter } from "langchain/text_splitter";
-import { validateUserAndCompanyMutations } from "./helpers/utils";
+import {
+  validateNoteAccess,
+  validateNoteAccessMutation,
+  validateUserAndCompany,
+  validateUserAndCompanyMutations,
+} from "./helpers/utils";
 import { internal } from "./_generated/api";
+import { DataModel, Doc, Id } from "./_generated/dataModel";
+
+export const archive = mutation({
+  args: { id: v.id("notes") },
+  handler: async (ctx, args) => {
+    const { identity, company } = await validateUserAndCompanyMutations(
+      ctx,
+      "Notes",
+    );
+    const existingNotes = await validateNoteAccessMutation(
+      args.id,
+      company,
+      ctx,
+    );
+    const recursiveArchive = async (noteId: Id<"notes">) => {
+      const children = await ctx.db
+        .query("notes")
+        .withIndex("by_user_parent", (q) =>
+          q.eq("userId", identity.tokenIdentifier).eq("parentNote", noteId),
+        )
+        .collect();
+
+      for (const child of children) {
+        await ctx.db.patch(child._id, {
+          isArchived: true,
+        });
+
+        await recursiveArchive(child._id);
+      }
+    };
+
+    const note = await ctx.db.patch(args.id, {
+      isArchived: true,
+    });
+
+    recursiveArchive(args.id);
+
+    return note;
+  },
+});
+
+//flag
+export const getSidebar = query({
+  args: {
+    parentNote: v.optional(v.id("notes")),
+  },
+  handler: async (ctx, args) => {
+    const { identity, company } = await validateUserAndCompany(ctx, "Notes");
+
+    const userId = identity.subject;
+
+    //replace userId with companyId
+
+    const notes = await ctx.db
+      .query("notes")
+      .withIndex("by_user_parent", (q) =>
+        q.eq("userId", userId).eq("parentNote", args.parentNote),
+      )
+      .filter((q) => q.eq(q.field("isArchived"), false))
+      .order("desc")
+      .collect();
+
+    return notes;
+  },
+});
 
 export const create = mutation({
   args: {
@@ -33,34 +103,29 @@ export const create = mutation({
 export const getById = query({
   args: { noteId: v.optional(v.id("notes")) },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
+    const { identity, company } = await validateUserAndCompany(ctx, "Notes");
 
     if (!args.noteId) {
-      return null;
+      throw new ConvexError({
+        message: "Note not found",
+        severity: "low",
+      });
     }
-    const note = await ctx.db.get(args.noteId);
+    const note = await validateNoteAccess(args.noteId, company, ctx);
 
     if (!note) {
-      return null;
+      throw new ConvexError({
+        message: "Note not found",
+        severity: "low",
+      });
     }
 
-    if (note.isPublished && !note.isArchived) {
-      return note;
-    }
-
-    if (!identity) {
-      return;
-    }
-
-    const userId = identity.tokenIdentifier;
-    const userEmail = identity.email;
-
-    if (
-      note.userId !== userId &&
-      !note.editors?.includes(userEmail as string)
-    ) {
-      throw new Error("Unauthorized");
-    }
+    // if (note.isPublished || !note.isArchived) {
+    //   throw new ConvexError({
+    //     message: "Note not found",
+    //     severity: "low",
+    //   });
+    // }
 
     return note;
   },
@@ -77,59 +142,30 @@ export const update = mutation({
     editor: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-
-    if (!identity) {
-      throw new Error("Unauthenticated");
-    }
+    const { identity, company } = await validateUserAndCompanyMutations(
+      ctx,
+      "Notes",
+    );
+    const existingNote = await validateNoteAccessMutation(
+      args.id,
+      company,
+      ctx,
+    );
 
     const userId = identity.tokenIdentifier;
-    const userEmail = identity.email;
 
     const { id, editor, ...rest } = args;
     //break
-    const existingNote = await ctx.db.get(args.id);
-
-    if (!existingNote) {
-      throw new Error("Not found");
-    }
-
-    if (
-      existingNote.userId !== userId &&
-      !existingNote.editors?.includes(userEmail as string)
-    ) {
-      throw new Error("Unauthorized");
-    }
-
-    const existingEditors = existingNote.editors || [];
-
-    //Consider refactoring. Perhaps i should have a separate function that handles adding editors.
-    //only the creators should have the power to add editors or permanently delete a document
-    if (editor) {
-      if (!existingEditors.includes(editor)) {
-        existingEditors.push(editor);
-        const updatedNote = await ctx.db.patch(id, {
-          ...rest,
-          editors: existingEditors,
-        });
-
-        return updatedNote;
-      } else {
-        throw new Error("Editor already has access");
-      }
-    }
 
     const note = await ctx.db.patch(args.id, {
       ...rest,
     });
 
-    //check the stack to see how they handled the url, to make sure we were only doing it for one page at a time. I think i need to do a similar thing,
-    //but with the document Id
-
     return note;
   },
 });
 
+///// redundant?
 export const generateUploadUrl = mutation(async (ctx) => {
   return await ctx.storage.generateUploadUrl();
 });
@@ -148,6 +184,7 @@ export const generateImageUrl = mutation({
     return imageUrl;
   },
 });
+/////
 
 //starts the embedding process
 export const updateNoteText = mutation({
@@ -188,5 +225,196 @@ export const updateNoteText = mutation({
       category: "note",
       companyId: company._id,
     });
+  },
+});
+
+//Inefficient to two of these (the second one being in files).
+//I can improve how we had notes file saving.
+
+export const saveCoverImageStorageIds = mutation({
+  args: {
+    noteId: v.id("notes"),
+    storageId: v.id("_storage"),
+  },
+  handler: async (ctx, { noteId, storageId }) => {
+    const { company } = await validateUserAndCompanyMutations(ctx, "Notes");
+
+    const note = await ctx.db.get(noteId);
+    if (!note) {
+      throw new ConvexError({
+        message: "Note not found",
+        severity: "low",
+      });
+    }
+
+    if (note.companyId !== company._id) {
+      throw new ConvexError({
+        message: "Unauthorized to view this note. Company mismatch",
+        severity: "low",
+      });
+    }
+
+    const coverImage = await ctx.storage.getUrl(storageId);
+    if (!coverImage) {
+      throw new ConvexError({
+        message: "File not found",
+        severity: "low",
+      });
+    }
+
+    await ctx.db.patch(noteId, {
+      coverImage,
+    });
+  },
+});
+
+export const getTrash = query({
+  handler: async (ctx) => {
+    const { identity, company } = await validateUserAndCompany(ctx, "Notes");
+
+    const notes = await ctx.db
+      .query("notes")
+      .withIndex("by_company", (q) => q.eq("companyId", company._id))
+      .filter((q) => q.eq(q.field("isArchived"), true))
+      .order("desc")
+      .collect();
+
+    return notes;
+  },
+});
+
+//flag
+export const restore = mutation({
+  args: { id: v.id("notes") },
+  handler: async (ctx, args) => {
+    const { identity, company } = await validateUserAndCompanyMutations(
+      ctx,
+      "Notes",
+    );
+
+    const existingNote = await validateNoteAccessMutation(
+      args.id,
+      company,
+      ctx,
+    );
+
+    //replace with companyId
+    const recursiveRestore = async (noteId: Id<"notes">) => {
+      const children = await ctx.db
+        .query("notes")
+        .withIndex("by_user_parent", (q) =>
+          q.eq("userId", identity.tokenIdentifier).eq("parentNote", noteId),
+        )
+        .collect();
+
+      for (const child of children) {
+        await ctx.db.patch(child._id, {
+          isArchived: false,
+        });
+
+        await recursiveRestore(child._id);
+      }
+    };
+
+    const options: Partial<Doc<"notes">> = {
+      isArchived: false,
+    };
+
+    if (existingNote.parentNote) {
+      const parent = await ctx.db.get(existingNote.parentNote);
+      if (parent?.isArchived) {
+        options.parentNote = undefined;
+      }
+    }
+
+    const note = await ctx.db.patch(args.id, options);
+
+    recursiveRestore(args.id);
+
+    return note;
+  },
+});
+
+export const remove = mutation({
+  args: { id: v.id("notes") },
+  handler: async (ctx, args) => {
+    const { identity, company } = await validateUserAndCompanyMutations(
+      ctx,
+      "Notes",
+    );
+
+    await validateNoteAccessMutation(args.id, company, ctx);
+
+    await ctx.db.delete(args.id);
+
+    return true;
+  },
+});
+
+export const getSearch = query({
+  handler: async (ctx) => {
+    const { identity, company } = await validateUserAndCompany(ctx, "Notes");
+
+    const notes = await ctx.db
+      .query("notes")
+      .withIndex("by_company", (q) => q.eq("companyId", company._id))
+      .filter((q) => q.eq(q.field("isArchived"), false))
+      .order("desc")
+      .collect();
+
+    return notes;
+  },
+});
+
+export const removeIcon = mutation({
+  args: { id: v.id("notes") },
+  handler: async (ctx, args) => {
+    const { identity, company } = await validateUserAndCompanyMutations(
+      ctx,
+      "Notes",
+    );
+
+    await validateNoteAccessMutation(args.id, company, ctx);
+
+    await ctx.db.patch(args.id, {
+      icon: undefined,
+    });
+
+    return true;
+  },
+});
+
+export const removeCoverImage = mutation({
+  args: { id: v.id("notes") },
+  handler: async (ctx, args) => {
+    const { identity, company } = await validateUserAndCompanyMutations(
+      ctx,
+      "Notes",
+    );
+
+    await validateNoteAccessMutation(args.id, company, ctx);
+
+    await ctx.db.patch(args.id, {
+      coverImage: undefined,
+    });
+
+    return true;
+  },
+});
+
+export const searchNotes = query({
+  args: { query: v.string() },
+  handler: async (ctx, args) => {
+    const { identity, company } = await validateUserAndCompany(ctx, "Notes");
+
+    return await ctx.db
+      .query("notes")
+      .withSearchIndex("search_content", (q) =>
+        q
+          .search("content", args.query)
+          .eq("companyId", company._id)
+          .eq("isArchived", false),
+      )
+      .take(5);
   },
 });

@@ -5,7 +5,7 @@ import { ImageIcon, Smile, X } from "lucide-react";
 import { useMutation } from "convex/react";
 import TextareaAutosize from "react-textarea-autosize";
 
-//import { useCoverImage } from "@/hooks/use-cover-image";
+import { useCoverImage } from "@/hooks/use-cover-image";
 import { Doc } from "@/convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
 import { api } from "@/convex/_generated/api";
@@ -23,9 +23,9 @@ export const Toolbar = ({ initialData, preview }: ToolbarProps) => {
   const [value, setValue] = useState(initialData.title);
 
   const update = useMutation(api.notes.update);
-  //const removeIcon = useMutation(api.notes.removeIcon);
+  const removeIcon = useMutation(api.notes.removeIcon);
 
-  // const coverImage = useCoverImage();
+  const coverImage = useCoverImage();
 
   const enableInput = () => {
     if (preview) return;
@@ -61,11 +61,11 @@ export const Toolbar = ({ initialData, preview }: ToolbarProps) => {
     });
   };
 
-  // const onRemoveIcon = () => {
-  //   removeIcon({
-  //     id: initialData._id
-  //   })
-  // }
+  const onRemoveIcon = () => {
+    removeIcon({
+      id: initialData._id
+    })
+  }
 
   return (
     <div className="pl-[54px] group relative">
@@ -77,7 +77,7 @@ export const Toolbar = ({ initialData, preview }: ToolbarProps) => {
             </p>
           </IconPicker>
           <Button
-            //  onClick={onRemoveIcon}
+             onClick={onRemoveIcon}
             className="rounded-full opacity-0 group-hover/icon:opacity-100 transition text-muted-foreground text-xs"
             variant="outline"
             size="icon"
@@ -104,7 +104,7 @@ export const Toolbar = ({ initialData, preview }: ToolbarProps) => {
         )}
         {!initialData.coverImage && !preview && (
           <Button
-            //  onClick={coverImage.onOpen}
+             onClick={coverImage.onOpen}
             className="text-muted-foreground text-xs"
             variant="outline"
             size="sm"
