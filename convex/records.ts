@@ -27,10 +27,10 @@ export const createRecord = mutation({
       "Records",
     );
 
-    // let fileUrl = (await ctx.storage.getUrl(storageId)) as string;
-    let fileUrl = (await ctx.storage.getUrl(
-      "kg28zy3j5sp6kyt575k2vzcm056kzhph",
-    )) as string;
+    let fileUrl = (await ctx.storage.getUrl(storageId)) as string;
+    // let fileUrl = (await ctx.storage.getUrl(
+    //   "kg28zy3j5sp6kyt575k2vzcm056kzhph",
+    // )) as string;
 
     const recordId = await ctx.db.insert("records", {
       userId: identity.tokenIdentifier,

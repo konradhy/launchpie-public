@@ -67,6 +67,8 @@ export const chat = internalAction({
       });
       const { title, summary, actionItems } = extract;
 
+      console.log("this is what was extracted:", title, summary, actionItems);
+
       await ctx.runMutation(internal.together.saveSummary, {
         id: args.id,
         summary,
