@@ -2,6 +2,40 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
+  records: defineTable({
+    userId: v.string(),
+    audioFileId: v.string(),
+    audioFileUrl: v.string(),
+    title: v.optional(v.string()),
+    transcription: v.optional(v.string()),
+    summary: v.optional(v.string()),
+    embedding: v.optional(v.array(v.float64())),
+    generatingTranscript: v.boolean(),
+    generatingTitle: v.boolean(),
+    generatingActionItems: v.boolean(),
+    companyId: v.id("companies"),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_companyId", ["companyId"])
+
+    .vectorIndex("by_embedding", {
+      vectorField: "embedding",
+      dimensions: 768,
+      filterFields: ["userId", "companyId"],
+    }),
+
+  //i think this is being replaced completely by tasks
+  actionItems: defineTable({
+    recordId: v.id("records"),
+    userId: v.string(),
+    companyId: v.id("companies"),
+    task: v.string(),
+    personId: v.optional(v.id("persons")),
+  })
+    .index("by_recordId", ["recordId"])
+    .index("by_userId", ["userId"])
+    .index("by_companyId", ["companyId"]),
+
   users: defineTable({
     name: v.string(),
     tokenIdentifier: v.string(),

@@ -94,7 +94,7 @@ const NoteIdPage = ({ params }: NoteIdPageProps) => {
   const [noteContent, setNoteContent] = useState(note?.content);
 
   const update = useMutation(api.notes.update);
-  const updateNoteText = useMutation(api.notes.updateNoteText);
+  // const updateNoteText = useMutation(api.notes.updateNoteText);
   // useTypingIndicator(data.text, updatePresence); //Refactor
   // Update presence data including typing status
 
@@ -102,13 +102,6 @@ const NoteIdPage = ({ params }: NoteIdPageProps) => {
     update({
       id: params.noteId,
       content,
-    });
-  };
-
-  const onSave = () => () => {
-    console.log("save");
-    updateNoteText({
-      id: params.noteId,
     });
   };
 
@@ -138,12 +131,10 @@ const NoteIdPage = ({ params }: NoteIdPageProps) => {
     return <div>Not found</div>;
   }
 
-  //hscreen might be affecting the toolbar
-  //figure out the cover ts error
   return (
     <div className="pb-40 bg-white dark:bg-[#1F1F1F]  h-screen">
       <Cover url={note.coverImage} />
-      <Button onClick={onSave()}>Save</Button>
+
       <div
         ref={ref}
         onPointerMove={(e) => {

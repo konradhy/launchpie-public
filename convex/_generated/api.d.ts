@@ -17,6 +17,7 @@ import type {
 import type * as companies from "../companies.js";
 import type * as equityPie from "../equityPie.js";
 import type * as files from "../files.js";
+import type * as generate from "../generate.js";
 import type * as helpers_ingestHelpers from "../helpers/ingestHelpers.js";
 import type * as helpers_utils from "../helpers/utils.js";
 import type * as helpers from "../helpers.js";
@@ -26,9 +27,12 @@ import type * as ingest_extract from "../ingest/extract.js";
 import type * as messages from "../messages.js";
 import type * as notes from "../notes.js";
 import type * as persons from "../persons.js";
+import type * as records from "../records.js";
 import type * as serve from "../serve.js";
 import type * as tasks from "../tasks.js";
+import type * as together from "../together.js";
 import type * as users from "../users.js";
+import type * as whisper from "../whisper.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -42,6 +46,7 @@ declare const fullApi: ApiFromModules<{
   companies: typeof companies;
   equityPie: typeof equityPie;
   files: typeof files;
+  generate: typeof generate;
   "helpers/ingestHelpers": typeof helpers_ingestHelpers;
   "helpers/utils": typeof helpers_utils;
   helpers: typeof helpers;
@@ -51,9 +56,12 @@ declare const fullApi: ApiFromModules<{
   messages: typeof messages;
   notes: typeof notes;
   persons: typeof persons;
+  records: typeof records;
   serve: typeof serve;
   tasks: typeof tasks;
+  together: typeof together;
   users: typeof users;
+  whisper: typeof whisper;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,

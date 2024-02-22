@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { useParams } from "next/navigation";
 import { MenuIcon } from "lucide-react";
 
@@ -19,10 +19,18 @@ interface NotesNavProps {
 
 export const NotesNav = ({ isCollapsed, onResetWidth }: NotesNavProps) => {
   const params = useParams();
+  const chunkNoteText = useMutation(api.notes.chunkNoteText);
 
   const note = useQuery(api.notes.getById, {
     noteId: params.noteId as Id<"notes">,
   });
+
+  const onSave = async () => {
+    console.log("save");
+    await chunkNoteText({
+      id: params.noteId as Id<"notes">,
+    });
+  };
 
   if (note === undefined) {
     return (
@@ -52,6 +60,7 @@ export const NotesNav = ({ isCollapsed, onResetWidth }: NotesNavProps) => {
         <div className="flex items-center justify-between w-full">
           <Title initialData={note} />
           <div className="flex items-center gap-x-2">
+            <button onClick={onSave}>Feed Quity</button>
             <Publish initialData={note} />
             <Menu noteId={note._id} />
           </div>

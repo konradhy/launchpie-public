@@ -49,7 +49,7 @@ import "../_components/notes.css"; //debug
 import { useParams } from "next/navigation";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useMutation } from "convex/react";
+import { useAction, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 //import { PresenceData } from "@/hooks/usePresence";
 
@@ -81,22 +81,19 @@ const Editor = ({
   const { resolvedTheme } = useTheme();
   const [notification, setNotification] = useState(false);
 
-  const generateUploadUrl = useMutation(api.notes.generateUploadUrl); //works as expected
+  const generateUploadUrl = useMutation(api.notes.generateUploadUrl);
   const generateImageUrl = useMutation(api.notes.generateImageUrl);
 
+  //i should add some type of authentication headings
   const handleUpload = async (file: File) => {
     const uploadUrl = await generateUploadUrl();
-    //i should add some type of authentication headings
     const result = await fetch(uploadUrl, {
       method: "POST",
       headers: { "Content-Type": file!.type },
       body: file,
     });
-
     const { storageId } = await result.json();
-
     const imageUrl = await generateImageUrl({ id: storageId });
-
     return imageUrl as any;
   };
 
@@ -115,6 +112,11 @@ const Editor = ({
     useCompletion({
       api: "/api/generate/storymaker",
     });
+
+  /*
+    it has to be an http route
+    and that route will call an internal action
+    */
 
   //AI Blocks
   //translate block

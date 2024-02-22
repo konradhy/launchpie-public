@@ -200,6 +200,10 @@ export const noteChunker = internalMutation({
           companyId: args.companyId,
         });
       });
+
+      //in the future this should be decoupled from the chunker.
+
+      await ctx.scheduler.runAfter(0, internal.ingest.embed.embedAll);
     }
   },
 });

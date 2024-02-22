@@ -3,13 +3,16 @@ import {
   GenericQueryCtx,
   UserIdentity,
   GenericMutationCtx,
+  GenericActionCtx,
 } from "convex/server";
 import { ConvexError, GenericId, v } from "convex/values";
+import { Auth } from "convex/server";
 
 enum ErrorMessage {
   Files = "You must be logged in to access files.",
   Notes = "You must be logged in to access notes.",
   CompanyInformation = "You must be logged in to access company information.",
+  Records = "You must be logged in to access recordings.",
 }
 
 export async function validateUserAndCompany(
@@ -114,12 +117,37 @@ export async function validateUserAndCompanyMutations(
   return { user, company, identity };
 }
 
+async function getUserId(ctx: { auth: Auth }) {
+  const authInfo = await ctx.auth.getUserIdentity();
+  return authInfo?.tokenIdentifier;
+}
 
+//actions can't access the db. i'd need to schedule a runQuery
+export async function validateUserAndCompanyActions(
+  ctx: GenericActionCtx<DataModel>,
+  errorContext: keyof typeof ErrorMessage,
+): Promise<{
+  identity: UserIdentity;
+}> {
+  //does identiyy work in actions?
+  const identity = await ctx.auth.getUserIdentity();
+  console.log("testing to see if identity works in actions: ");
+  console.log(identity);
+
+  if (!identity) {
+    throw new ConvexError({
+      message: ErrorMessage[errorContext],
+      severity: "low",
+    });
+  }
+
+  return { identity };
+}
 
 export async function validateNoteAccessMutation(
   id: Id<"notes">,
   company: Doc<"companies">,
-  ctx: GenericMutationCtx<DataModel>
+  ctx: GenericMutationCtx<DataModel>,
 ) {
   const note = await ctx.db.get(id);
   if (!note) {
@@ -141,7 +169,7 @@ export async function validateNoteAccessMutation(
 export async function validateNoteAccess(
   id: Id<"notes">,
   company: Doc<"companies">,
-  ctx: GenericQueryCtx<DataModel>
+  ctx: GenericQueryCtx<DataModel>,
 ) {
   const note = await ctx.db.get(id);
   if (!note) {
