@@ -57,8 +57,6 @@ export const extractTextNote = internalAction({
       text: extractedTexts.join("\n"),
       args: args,
     });
-
-    console.log("extractTextNote", extractedTexts);
   },
 });
 

@@ -1,8 +1,7 @@
 import { ConvexError, v } from "convex/values";
 
-import { internalMutation, mutation, query } from "./_generated/server";
-import { asyncMap } from "modern-async";
-import { CharacterTextSplitter } from "langchain/text_splitter";
+import { mutation, query } from "./_generated/server";
+
 import {
   validateNoteAccess,
   validateNoteAccessMutation,
@@ -10,7 +9,7 @@ import {
   validateUserAndCompanyMutations,
 } from "./helpers/utils";
 import { internal } from "./_generated/api";
-import { DataModel, Doc, Id } from "./_generated/dataModel";
+import { Doc, Id } from "./_generated/dataModel";
 
 export const archive = mutation({
   args: { id: v.id("notes") },
@@ -187,7 +186,7 @@ export const generateImageUrl = mutation({
 /////
 
 //starts the embedding process
-export const updateNoteText = mutation({
+export const chunkNoteText = mutation({
   args: {
     id: v.id("notes"),
   },
