@@ -1,11 +1,8 @@
-import { ConvexError, v } from "convex/values";
+import { v } from "convex/values";
 
-import { mutation, query } from "./_generated/server";
+import { mutation } from "./_generated/server";
 
-import {
-  validateUserAndCompany,
-  validateUserAndCompanyMutations,
-} from "./helpers/utils";
+import { validateUserAndCompanyMutations } from "./helpers/utils";
 import { internal } from "./_generated/api";
 
 export const generateUploadUrl = mutation({
@@ -44,6 +41,7 @@ export const createRecord = mutation({
     await ctx.scheduler.runAfter(0, internal.whisper.chat, {
       fileUrl,
       id: recordId,
+      companyId: company._id,
     });
     return recordId;
   },

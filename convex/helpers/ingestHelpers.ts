@@ -1,4 +1,4 @@
-import { paginate } from "../helpers";
+import { paginate } from "../helpers/utils";
 import { GenericActionCtx, GenericMutationCtx } from "convex/server";
 import { ConvexError, v } from "convex/values";
 import { asyncMap } from "modern-async";

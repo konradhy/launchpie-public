@@ -20,6 +20,7 @@ export const chat = internalAction({
   args: {
     fileUrl: v.string(),
     id: v.id("records"),
+    companyId: v.id("companies"),
   },
   handler: async (ctx, args) => {
     const replicateOutput = (await replicate.run(
@@ -46,31 +47,44 @@ export const chat = internalAction({
     await ctx.runMutation(internal.whisper.saveTranscript, {
       id: args.id,
       transcript,
+      companyId: args.companyId,
     });
   },
 });
 
+//do i pass companyId in along with recordId or do I make a database call?
 export const saveTranscript = internalMutation({
   args: {
     id: v.id("records"),
     transcript: v.string(),
+    companyId: v.id("companies"),
   },
-  handler: async (ctx, args) => {
-    const { id, transcript } = args;
-
+  handler: async (ctx, { id, transcript, companyId }) => {
     await ctx.db.patch(id, {
       transcription: transcript,
       generatingTranscript: false,
     });
 
+    await ctx.scheduler.runAfter(
+      0,
+      internal.helpers.promptHelpers.generateTaskObject,
+      {
+        id,
+        transcript,
+        companyId,
+      },
+    );
+
+    //redundant?
     await ctx.scheduler.runAfter(0, internal.together.chat, {
-      id: args.id,
+      id,
       transcript,
     });
 
+    //feed this to the chat as more
     await ctx.scheduler.runAfter(0, internal.together.embed, {
-      id: args.id,
-      transcript: transcript,
+      id,
+      transcript,
     });
   },
 });

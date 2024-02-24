@@ -1,4 +1,4 @@
-import { DataModel, Doc, Id } from "../_generated/dataModel";
+import { DataModel, Doc, Id, TableNames } from "../_generated/dataModel";
 import {
   GenericQueryCtx,
   UserIdentity,
@@ -7,6 +7,10 @@ import {
 } from "convex/server";
 import { ConvexError, GenericId, v } from "convex/values";
 import { Auth } from "convex/server";
+import { PaginationResult } from "convex/server";
+import { internal } from "../_generated/api";
+
+import { ActionCtx, QueryCtx, internalQuery } from "../_generated/server";
 
 enum ErrorMessage {
   Files = "You must be logged in to access files.",
@@ -187,3 +191,36 @@ export async function validateNoteAccess(
   }
   return note;
 }
+
+export async function paginate<T extends TableNames>(
+  ctx: ActionCtx,
+  table: T,
+  batchSize: number,
+  callback: (documents: Doc<T>[]) => Promise<void>,
+): Promise<void> {
+  let isDone = false;
+  let cursor = null;
+  while (!isDone) {
+    const result: PaginationResult<Doc<T>> = (await ctx.runQuery(
+      internal.helpers.utils.paginateQuery,
+      {
+        table,
+        cursor,
+        numItems: batchSize,
+      },
+    )) as any;
+    await callback(result.page);
+    ({ isDone, continueCursor: cursor } = result);
+  }
+}
+
+export const paginateQuery = internalQuery(
+  async <T extends TableNames>(
+    ctx: QueryCtx,
+    args: { table: T; cursor: any; numItems: number },
+  ) => {
+    return await ctx.db
+      .query(args.table)
+      .paginate({ cursor: args.cursor, numItems: args.numItems });
+  },
+);

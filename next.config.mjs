@@ -4,7 +4,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "judicious-corgi-741.convex.cloud", //this will fail for production, make it dynamic
+        hostname: process.env.NEXT_PUBLIC_HOSTNAME, //this will fail for production, make it dynamic
       },
     ],
   },
