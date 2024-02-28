@@ -72,7 +72,7 @@ const taskSchema = z.object({
     ])
     .optional(),
   meetingAgendaFlag: z.boolean().optional(),
-  equityValue: z.number().min(1, "Equity value is required"),
+
   notes: z.string().optional(),
   companyId: z.string(),
   priority: z
@@ -98,7 +98,7 @@ export const NewTaskForm = ({ companyId }: NewTaskFormProps) => {
       taskState: "notStarted",
       reviewStatus: "notFlagged",
       meetingAgendaFlag: false,
-      equityValue: 1,
+
       notes: "",
       companyId,
       priority: "low",
@@ -231,7 +231,6 @@ export const NewTaskForm = ({ companyId }: NewTaskFormProps) => {
           )}
         />
 
-        {/* Add additional fields for taskState, reviewStatus, meetingAgendaFlag, equityValue, notes following the same pattern */}
         <Collapsible open={isOpen} onOpenChange={setIsOpen}>
           <CollapsibleTrigger asChild>
             <div className="flex items-center justify-center hover:cursor-pointer t">

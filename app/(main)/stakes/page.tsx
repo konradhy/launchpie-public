@@ -57,11 +57,10 @@ export default function TaskPage() {
       </div>
     );
   }
-  // The rest of your component...
 
   const tableData = tasks.map((task, index) => {
     return {
-      title: task.description,
+      title: task.title || "loading...",
       _id: task._id,
       status: task.taskState,
       priority: task.priority,

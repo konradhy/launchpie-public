@@ -7,12 +7,14 @@ import { Spinner } from "@/components/spinner";
 import { Doc } from "@/convex/_generated/dataModel";
 
 export const EquityBarchart = () => {
-  const lineData = useQuery(api.equityPie.equityBarchart);
+  const lineData = useQuery(api.dashboard.equityPie.equityBarchart);
 
   if (!lineData) {
     return <Spinner />;
   }
 
+  //this seems really important to get right
+  //@ts-ignore
   const assigneeLines = transformDataForAssigneeEquity(lineData);
 
   return (
@@ -103,7 +105,7 @@ type GroupedTasks = {
       taskState: "notStarted" | "inProgress" | "completed";
       reviewStatus: "notFlagged" | "flagged" | "approved";
       meetingAgendaFlag: boolean;
-      equityValue: number;
+      equityValue: number | 0;
       notes?: string;
       userId: string;
       companyId: string; // Assuming this requires a string or specific ID format

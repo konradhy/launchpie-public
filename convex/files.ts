@@ -37,7 +37,6 @@ export const saveStorageIds = mutation({
   handler: async (ctx, args) => {
     const { identity } = await validateUserAndCompanyMutations(ctx, "Files");
     //configure to save multiple files
-    //temporarily throw an error if it's not a docx. Maybe do it on frontend?
 
     //saves the files to the database
     const fileIds = await Promise.all(
@@ -57,27 +56,34 @@ export const saveStorageIds = mutation({
 
     //I need to iterate over the files, as it stands right now, the ChatBot will only be trained on the first file that you give it.
     const storageId = args.uploaded[0].storageId;
+    const isDocx = args.uploaded[0].fileName.endsWith(".docx");
+    console.log("isDocx", isDocx);
+    console.log(args.uploaded[0].fileName);
 
-    //manual hack was used here for typing fix properly later, see earlier note
-    const fileUrl = await ctx.storage.getUrl(storageId as Id<"_storage">);
-    if (!fileUrl) {
-      throw new ConvexError({
-        message: "File not found",
-        severity: "low",
+    if (isDocx) {
+      //manual hack was used here for typing fix properly later, see earlier note
+      const fileUrl = await ctx.storage.getUrl(storageId as Id<"_storage">);
+      if (!fileUrl) {
+        throw new ConvexError({
+          message: "File not found",
+          severity: "low",
+        });
+      }
+
+      //call internal action, passing the files one at a time
+      await ctx.scheduler.runAfter(0, internal.ingest.extract.extractTextFile, {
+        fileUrl: fileUrl,
+        id: fileIds[0],
+        author: identity.name || "",
+        summary: "",
+        title: args.uploaded[0].fileName,
+        uploadedAt: new Date().toISOString(),
+        category: "file",
+        companyId: args.companyId,
       });
+      return true;
     }
-
-    //call internal action, passing the files one at a time
-    await ctx.scheduler.runAfter(0, internal.ingest.extract.extractTextFile, {
-      fileUrl: fileUrl,
-      id: fileIds[0],
-      author: identity.name || "",
-      summary: "",
-      title: args.uploaded[0].fileName,
-      uploadedAt: new Date().toISOString(),
-      category: "file",
-      companyId: args.companyId,
-    });
+    return false;
   },
 });
 

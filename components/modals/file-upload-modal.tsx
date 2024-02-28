@@ -26,14 +26,21 @@ export const FileUploadModal = () => {
     try {
       if (!data?._id) return;
 
-      await saveStorageId({
+      const isDocx = await saveStorageId({
         companyId: data._id,
         uploaded: uploaded.map((response) => ({
           storageId: (response as any).response.storageId,
           fileName: (response as UploadFileResponse).name,
         })),
       });
-      toast.success("File uploaded successfully");
+      if (isDocx) {
+        toast.success("File uploaded successfully");
+        fileUpload.onClose();
+      }
+
+      toast.warning(
+        "File uploaded. However Quity is only able to read docx files! Quity won't be able to read this file.",
+      );
       fileUpload.onClose();
     } catch (e) {
       toast.error("Error uploading file");

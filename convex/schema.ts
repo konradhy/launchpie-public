@@ -124,7 +124,7 @@ export default defineSchema({
       v.literal("approved"),
     ),
     meetingAgendaFlag: v.boolean(),
-    equityValue: v.optional(v.number()),
+    equityValue: v.number(),
     notes: v.optional(v.string()),
     userId: v.string(),
     companyId: v.id("companies"),

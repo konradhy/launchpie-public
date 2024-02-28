@@ -26,6 +26,7 @@ import CompanyDetailsCard from "./_components/_company-details/company-details";
 import { ConvexAiChat } from "@/app/aiChat";
 import EquityPie from "./_components/equity-pie";
 import { EquityBarchart } from "./_components/equity-barchart";
+import EquityCardArea from "./_components/equity-card-area";
 
 export const metadata: Metadata = {
   title: `${appName} | Dashboard`,
@@ -35,62 +36,6 @@ export const metadata: Metadata = {
 export default function DashboardPage() {
   //i think i just pass the shareholderid here. Then i do everything else in the equity card
   //create a new component called equity card holder. This will be a use client that holds the equity card map
-  const equityData = [
-    {
-      shareholderName: "Alice Smith",
-      totalEquity: "$5,400",
-      lastContributionDate: "2023-09-12",
-      tasks: ["Design", "Development"],
-    },
-    {
-      shareholderName: "Bob Johnson",
-      totalEquity: "$3,200",
-      lastContributionDate: "2023-09-10",
-      tasks: ["Marketing", "Sales"],
-    },
-    {
-      shareholderName: "Alice Smith",
-      totalEquity: "$5,400",
-      lastContributionDate: "2023-09-12",
-      tasks: ["Design", "Development"],
-    },
-    {
-      shareholderName: "Bob Johnson",
-      totalEquity: "$3,200",
-      lastContributionDate: "2023-09-10",
-      tasks: ["Marketing", "Sales"],
-    },
-    {
-      shareholderName: "Alice Smith",
-      totalEquity: "$5,400",
-      lastContributionDate: "2023-09-12",
-      tasks: ["Design", "Development"],
-    },
-    {
-      shareholderName: "Bob Johnson",
-      totalEquity: "$3,200",
-      lastContributionDate: "2023-09-10",
-      tasks: ["Marketing", "Sales"],
-    },
-    {
-      shareholderName: "Bob Johnson",
-      totalEquity: "$3,200",
-      lastContributionDate: "2023-09-10",
-      tasks: ["Marketing", "Sales"],
-    },
-    {
-      shareholderName: "Bob Johnson",
-      totalEquity: "$3,200",
-      lastContributionDate: "2023-09-10",
-      tasks: ["Marketing", "Sales"],
-    },
-    {
-      shareholderName: "Bob Johnson",
-      totalEquity: "$3,200",
-      lastContributionDate: "2023-09-10",
-      tasks: ["Marketing", "Sales"],
-    },
-  ];
 
   return (
     <>
@@ -112,16 +57,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="space-y-4">
-            <ScrollArea className="overflow-x-auto">
-              <div className="flex gap-8">
-                {equityData.map((data, index) => (
-                  <div key={index} className="">
-                    <EquityCard key={index} />
-                  </div>
-                ))}
-              </div>
-              <ScrollBar orientation="horizontal" />
-            </ScrollArea>
+            <EquityCardArea />
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
               <RecentSales />
 

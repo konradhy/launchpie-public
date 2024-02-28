@@ -114,6 +114,11 @@ export const extractTextTask = internalAction({
       args: args,
     });
 
+    await ctx.runAction(internal.helpers.promptHelpers.generateTaskTitle, {
+      transcript: taskNarrative,
+      taskId: args.id,
+    });
+
     return taskNarrative;
   },
 });

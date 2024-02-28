@@ -18,15 +18,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 
 import { toast } from "sonner";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+
 import { CaretSortIcon } from "@radix-ui/react-icons";
 import {
   DropdownMenu,
@@ -58,7 +52,7 @@ const taskSchema = z.object({
     ])
     .optional(),
   meetingAgendaFlag: z.boolean().optional(),
-  equityValue: z.number().min(1, "Equity value is required"),
+
   notes: z.string().optional(),
   actualTime: z.coerce.number().min(1, "Estimated time is required"),
 });
@@ -81,8 +75,6 @@ export const CompleteTaskForm = ({ task }: CompleteTaskFormProps) => {
       reviewStatus: task.reviewStatus,
       meetingAgendaFlag: task.meetingAgendaFlag,
       notes: task.notes,
-
-      equityValue: task.equityValue,
     },
   });
 

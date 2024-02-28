@@ -7,8 +7,6 @@ import {
 import { Id } from "./_generated/dataModel";
 import { internal } from "./_generated/api";
 import { getAll } from "convex-helpers/server/relationships";
-import { CharacterTextSplitter } from "langchain/text_splitter";
-import { asyncMap } from "modern-async";
 
 //get task by id
 export const getTaskById = query({
@@ -55,7 +53,7 @@ export const create = mutation({
       ),
     ),
     meetingAgendaFlag: v.optional(v.boolean()),
-    equityValue: v.number(),
+
     notes: v.optional(v.string()),
     priority: v.optional(
       v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
@@ -86,7 +84,7 @@ export const create = mutation({
       taskState: args.taskState || "notStarted",
       reviewStatus: args.reviewStatus || "notFlagged",
       meetingAgendaFlag: args.meetingAgendaFlag || false,
-      equityValue: args.equityValue,
+      equityValue: 0,
       notes: args.notes,
       userId: identity.tokenIdentifier,
       companyId: company._id,
@@ -353,5 +351,17 @@ export const calculateTheoreticalValue = internalMutation({
         });
       }),
     );
+  },
+});
+
+export const patchTaskTitle = internalMutation({
+  args: {
+    taskId: v.id("tasks"),
+    title: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.taskId, {
+      title: args.title,
+    });
   },
 });

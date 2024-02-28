@@ -158,6 +158,7 @@ export const insertGeneratedTasks = internalMutation({
         createdAt: new Date().toISOString(),
         updatedBy: args.recordId,
         isArchived: false,
+        equityValue: 0,
       });
     });
   },
@@ -340,6 +341,46 @@ export const generateFileSummary = internalAction({
     } catch (error) {
       throw new ConvexError(
         `An error occurred while trying to access openai API to generate file summary. ${error} `,
+      );
+    }
+  },
+});
+
+export const generateTaskTitle = internalAction({
+  args: {
+    transcript: v.string(),
+    taskId: v.id("tasks"),
+  },
+  handler: async (ctx, args) => {
+    try {
+      const openai = new OpenAI();
+      const completion = await openai.chat.completions.create({
+        messages: [
+          {
+            role: "system",
+            content: `You are an AI trained to generate the perfect title for a task based on the rest of the task details. The title should be short and sweet, yet informative. `,
+          },
+          {
+            role: "user",
+            content: `Here are the task details: ${args.transcript}`,
+          },
+        ],
+        model: "gpt-3.5-turbo-1106",
+      });
+
+      const title = completion.choices[0].message.content;
+      if (!title) {
+        throw new ConvexError(
+          "An error occurred while trying to access openai API to generate task title",
+        );
+      }
+      await ctx.runMutation(internal.tasks.patchTaskTitle, {
+        taskId: args.taskId,
+        title,
+      });
+    } catch (error) {
+      throw new ConvexError(
+        `An error occurred while trying to access openai API to generate task title. ${error} `,
       );
     }
   },

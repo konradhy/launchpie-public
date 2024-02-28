@@ -90,10 +90,11 @@ export const SearchCommand = () => {
       <CommandInput placeholder={`Search ${user?.fullName}'s workspace...`} />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
-        <TooltipProvider>
-          <Tooltip>
-            <CommandGroup heading="Uploaded Files">
-              {files?.map((file) => (
+
+        <CommandGroup heading="Uploaded Files">
+          <TooltipProvider>
+            <Tooltip>
+              {files?.map((file, index) => (
                 <CommandItem
                   key={file._id}
                   value={`${file._id}-${file.fileName}`}
@@ -104,10 +105,9 @@ export const SearchCommand = () => {
                     onClick={() => onSelectFile(file._id)}
                     className="truncate"
                   >
-                    <TooltipTrigger>{file.fileName}</TooltipTrigger>
-                    <TooltipContent className="max-w-md break-words whitespace-normal">
-                      {file.summary}
-                    </TooltipContent>
+                    <TooltipTrigger id={file.fileName + index}>
+                      {file.fileName}
+                    </TooltipTrigger>
                   </span>
                   <div>
                     <Trash
@@ -115,11 +115,14 @@ export const SearchCommand = () => {
                       className=" h-2 w-2 hover:text-red-500"
                     />
                   </div>
+                  <TooltipContent className="max-w-md break-words whitespace-normal">
+                    {file.summary}
+                  </TooltipContent>
                 </CommandItem>
               ))}
-            </CommandGroup>
-          </Tooltip>
-        </TooltipProvider>
+            </Tooltip>
+          </TooltipProvider>
+        </CommandGroup>
       </CommandList>
     </CommandDialog>
   );

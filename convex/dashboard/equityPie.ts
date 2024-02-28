@@ -1,9 +1,9 @@
 import { ConvexError, v } from "convex/values";
-import { internalMutation, mutation, query } from "./_generated/server";
-import { Doc, Id } from "./_generated/dataModel";
-import { internal } from "./_generated/api";
+import { internalMutation, mutation, query } from "../_generated/server";
+import { Doc, Id } from "../_generated/dataModel";
+import { internal } from "../_generated/api";
 import { asyncMap } from "modern-async";
-import { validateUserAndCompany } from "./helpers/utils";
+import { validateUserAndCompany } from "../helpers/utils";
 import { getAll } from "convex-helpers/server/relationships";
 
 interface MonthlyGroup {

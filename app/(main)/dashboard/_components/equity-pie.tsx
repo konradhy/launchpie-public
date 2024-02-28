@@ -24,7 +24,7 @@ export const transformEquityPieData = (equityPie: any) => {
 };
 
 const EquityPie = () => {
-  const equityPie = useQuery(api.equityPie.equityPie);
+  const equityPie = useQuery(api.dashboard.equityPie.equityPie);
   if (!equityPie) {
     return <Spinner />;
   }

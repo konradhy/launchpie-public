@@ -98,11 +98,6 @@ export const taskChunker = internalMutation({
   handler: async (ctx, { text, args }) => {
     const latestVersion = await ctx.db.get(args.id);
 
-    console.log("The lst text said this");
-    console.log(latestVersion?.text);
-
-    console.log("The new text says this");
-    console.log(text);
     const hasChanged = latestVersion === null || latestVersion.text !== text;
     if (hasChanged) {
       await ctx.db.patch(args.id, { text });
