@@ -103,7 +103,8 @@ export default defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_linkedUserId", ["linkedUserId"])
-    .index("by_email", ["email"]),
+    .index("by_email", ["email"])
+    .index("by_company", ["companyId"]),
 
   tasks: defineTable({
     title: v.optional(v.string()),

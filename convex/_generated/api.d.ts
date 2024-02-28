@@ -15,6 +15,8 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as companies from "../companies.js";
+import type * as dashboard_currentStakes from "../dashboard/currentStakes.js";
+import type * as dashboard_equityCard from "../dashboard/equityCard.js";
 import type * as dashboard_equityPie from "../dashboard/equityPie.js";
 import type * as files from "../files.js";
 import type * as helpers_ingestHelpers from "../helpers/ingestHelpers.js";
@@ -44,6 +46,8 @@ import type * as whisper from "../whisper.js";
  */
 declare const fullApi: ApiFromModules<{
   companies: typeof companies;
+  "dashboard/currentStakes": typeof dashboard_currentStakes;
+  "dashboard/equityCard": typeof dashboard_equityCard;
   "dashboard/equityPie": typeof dashboard_equityPie;
   files: typeof files;
   "helpers/ingestHelpers": typeof helpers_ingestHelpers;

@@ -121,7 +121,7 @@ export const EditTaskForm = ({ task }: EditTaskFormProps) => {
     }
     try {
       await updateTask({ ...data, taskId });
-      toast.success("Task successfully created");
+      toast.success("Task successfully edited");
 
       editTask.onClose();
     } catch (error) {

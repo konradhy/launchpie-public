@@ -4,6 +4,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Doc } from "@/convex/_generated/dataModel";
 
 const TaskCard = ({ task, detail }: { task: string; detail: string }) => {
   return (
@@ -14,39 +15,45 @@ const TaskCard = ({ task, detail }: { task: string; detail: string }) => {
   );
 };
 
+interface EquityCardProps {
+  firstName: string;
+  lastName: string;
+  totalEquity: number;
+  tasks: Doc<"tasks">[];
+}
+
 const EquityCard = ({
-  shareholderName = "John D.",
-  totalEquity = "$45,231.89",
-  lastContributionDate = "2023-09-15",
-  tasks = [
-    {
-      name: "Design System Update",
-      detail: "Finalizing the new color palette",
-    },
-    {
-      name: "Design System Update",
-      detail: "Finalizing the new color palette",
-    },
-    {
-      name: "Design System Update",
-      detail: "Finalizing the new color palette",
-    },
-  ],
-}) => {
+  firstName,
+  lastName,
+  totalEquity,
+  tasks,
+}: EquityCardProps) => {
   return (
     <Card className=" shadow rounded-lg overflow-hidden min-w-[350px] bg-background ">
       <CardHeader className="px-4 py-2 bg-slate-50 dark:bg-slate-800">
         <div className="flex justify-between items-center">
           <span className="text-xs font-medium text-gray-500 dark:text-gray-100 truncate">
-            Equity: <span>{totalEquity}</span>
+            Equity:{" "}
+            <span>
+              {new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "USD",
+              }).format(totalEquity)}
+            </span>
           </span>
-          <span className="text-xs text-gray-400">{shareholderName}</span>
+          <span className="text-xs text-gray-400">
+            {firstName} {lastName.charAt(0)}.
+          </span>
         </div>
       </CardHeader>
       <ScrollArea className="h-20">
         <CardContent className="p-3">
           {tasks.map((task, index) => (
-            <TaskCard key={index} task={task.name} detail={task.detail} />
+            <TaskCard
+              key={index}
+              task={task.title || "loading"}
+              detail={task.description}
+            />
           ))}
         </CardContent>
       </ScrollArea>

@@ -1,3 +1,6 @@
+"use client";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 import {
   CardTitle,
   CardDescription,
@@ -8,92 +11,51 @@ import {
 import { AvatarImage, AvatarFallback, Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Spinner } from "@/components/spinner";
+import { Doc } from "@/convex/_generated/dataModel";
 
-const TaskCard = ({
-  title,
-  dueDate,
-  reviewStatus,
-  badgeColor,
-}: {
-  title: string;
-  dueDate: string;
-  reviewStatus: string;
-  badgeColor: string;
-}) => (
+interface TaskCardProps {
+  task: Doc<"tasks">;
+}
+
+// Priority color mapping
+const priorityColorMap = {
+  high: "bg-pink-700",
+  medium: "bg-amber-600",
+  low: "bg-lime-500",
+};
+
+const TaskCard = ({ task }: TaskCardProps) => (
   <div className="p-4 bg-primary/5 rounded-lg shadow-md flex items-center justify-between cursor-pointer hover:bg-primary/10 dark:hover:bg-gray-700  dark:bg-slate-800">
-    <Avatar>
-      <AvatarImage src="/placeholder-avatar.png" />
-      <AvatarFallback>U</AvatarFallback>
-    </Avatar>
-    <div className="ml-4">
-      <h3 className="text-lg font-semibold truncate">{title}</h3>
-      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{dueDate}</p>
+    <div className="flex flex-row">
+      <Avatar>
+        <AvatarImage src="/placeholder-avatar.png" />
+        <AvatarFallback>U</AvatarFallback>
+      </Avatar>
+
+      <div className="ml-4">
+        {" "}
+        <h3 className="text-lg font-semibold truncate ">{task.title}</h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+          {task.dueDate}
+        </p>
+      </div>
     </div>
+
     <Badge
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${badgeColor} text-white`}
+      className={`rounded-full text-xs font-semibold text-slate-50 ${priorityColorMap[task.priority]}`}
     >
-      {reviewStatus}
+      {task.priority}
     </Badge>
   </div>
 );
 
 export default function Component() {
-  const tasks = [
-    {
-      title: "Task 1: Complete user onboarding",
-      dueDate: "Due in 3 days",
-      reviewStatus: "New",
-      badgeColor: "bg-green-500",
-    },
-    {
-      title: "Task 2: Update billing information",
-      dueDate: "Overdue by 2 days",
-      reviewStatus: "Overdue",
-      badgeColor: "bg-red-500",
-    },
-    {
-      title: "Task 3: Review quarterly report",
-      dueDate: "Due today",
-      reviewStatus: "Urgent",
-      badgeColor: "bg-blue-500",
-    },
-    {
-      title: "Task 1: Complete user onboarding",
-      dueDate: "Due in 3 days",
-      reviewStatus: "New",
-      badgeColor: "bg-green-500",
-    },
-    {
-      title: "Task 2: Update billing information",
-      dueDate: "Overdue by 2 days",
-      reviewStatus: "Overdue",
-      badgeColor: "bg-red-500",
-    },
-    {
-      title: "Task 3: Review quarterly report",
-      dueDate: "Due today",
-      reviewStatus: "Urgent",
-      badgeColor: "bg-blue-500",
-    },
-    {
-      title: "Task 1: Complete user onboarding",
-      dueDate: "Due in 3 days",
-      reviewStatus: "New",
-      badgeColor: "bg-green-500",
-    },
-    {
-      title: "Task 2: Update billing information",
-      dueDate: "Overdue by 2 days",
-      reviewStatus: "Overdue",
-      badgeColor: "bg-red-500",
-    },
-    {
-      title: "Task 3: Review quarterly report",
-      dueDate: "Due today",
-      reviewStatus: "Urgent",
-      badgeColor: "bg-blue-500",
-    },
-  ];
+  const tasks = useQuery(api.dashboard.currentStakes.getCurrentStakes);
+
+  if (!tasks) {
+    return <Spinner></Spinner>;
+  }
 
   return (
     <div className="w-full max-w-3xl mx-auto col-span-3">
@@ -105,7 +67,7 @@ export default function Component() {
         <ScrollArea className=" h-[120px] md:h-[345px]  ">
           <CardContent className="grid gap-4">
             {tasks.map((task, index) => (
-              <TaskCard key={index} {...task} />
+              <TaskCard key={index} task={task} />
             ))}
           </CardContent>
         </ScrollArea>

@@ -148,7 +148,7 @@ export const update = mutation({
       ),
     ),
     meetingAgendaFlag: v.optional(v.boolean()),
-    equityValue: v.optional(v.number()),
+
     notes: v.optional(v.string()),
     priority: v.optional(
       v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
@@ -181,7 +181,7 @@ export const update = mutation({
       taskState: args.taskState,
       reviewStatus: args.reviewStatus,
       meetingAgendaFlag: args.meetingAgendaFlag,
-      equityValue: args.equityValue,
+
       notes: args.notes,
       updatedAt: new Date().toISOString(),
       updatedBy: identity.tokenIdentifier,
