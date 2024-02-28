@@ -1,3 +1,7 @@
+"use client";
+
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
 import {
   Sheet,
   SheetTrigger,
@@ -31,6 +35,14 @@ export const InfoSection = ({
   description,
   details,
 }: InfoSectionProps) => {
+  const initializeAssociatedUser = useMutation(
+    api.users.initializeAssociatedUser,
+  );
+
+  const handleClick = async () => {
+    await initializeAssociatedUser();
+  };
+
   if (!details) {
     return <Spinner />;
   }
@@ -103,6 +115,7 @@ export const InfoSection = ({
               </div>
             ))}
           </TooltipProvider>
+          <Button onClick={handleClick}>Bind new users</Button>
           <Separator />
           <SheetFooter className="flex justify-end mt-4">
             <SheetClose asChild>

@@ -21,6 +21,7 @@ export const chat = internalAction({
     fileUrl: v.string(),
     id: v.id("records"),
     companyId: v.id("companies"),
+    defaultAssignee: v.id("persons"),
   },
   handler: async (ctx, args) => {
     const replicateOutput = (await replicate.run(
@@ -48,6 +49,7 @@ export const chat = internalAction({
       id: args.id,
       transcript,
       companyId: args.companyId,
+      defaultAssignee: args.defaultAssignee,
     });
   },
 });
@@ -58,8 +60,9 @@ export const saveTranscript = internalMutation({
     id: v.id("records"),
     transcript: v.string(),
     companyId: v.id("companies"),
+    defaultAssignee: v.id("persons"),
   },
-  handler: async (ctx, { id, transcript, companyId }) => {
+  handler: async (ctx, { id, transcript, companyId, defaultAssignee }) => {
     await ctx.db.patch(id, {
       transcription: transcript,
       generatingTranscript: false,
@@ -72,6 +75,7 @@ export const saveTranscript = internalMutation({
         id,
         transcript,
         companyId,
+        defaultAssignee,
       },
     );
 

@@ -35,6 +35,17 @@ export const extractTextFile = internalAction({
       args: args,
     });
 
+    //grab the first 1000 characters of the text
+
+    const summary = text.substring(0, 1000);
+
+    // This will output the first 1000 characters of the original string.
+
+    await ctx.runAction(internal.helpers.promptHelpers.generateFileSummary, {
+      transcript: summary,
+      fileId: args.id,
+    });
+
     return text;
   },
 });

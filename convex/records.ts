@@ -19,15 +19,15 @@ export const createRecord = mutation({
     storageId: v.id("_storage"),
   },
   handler: async (ctx, { storageId }) => {
-    const { identity, company } = await validateUserAndCompanyMutations(
+    const { user, identity, company } = await validateUserAndCompanyMutations(
       ctx,
       "Records",
     );
 
     let fileUrl = (await ctx.storage.getUrl(storageId)) as string;
-    // let fileUrl = (await ctx.storage.getUrl(
-    //   "kg28zy3j5sp6kyt575k2vzcm056kzhph",
-    // )) as string;
+    if (!user.linkedPersonId) {
+      throw new Error("User must be linked to a person to create a record");
+    }
 
     const recordId = await ctx.db.insert("records", {
       userId: identity.tokenIdentifier,
@@ -42,6 +42,7 @@ export const createRecord = mutation({
       fileUrl,
       id: recordId,
       companyId: company._id,
+      defaultAssignee: user.linkedPersonId,
     });
     return recordId;
   },

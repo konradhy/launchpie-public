@@ -15,6 +15,13 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useSearch } from "@/hooks/use-search";
 import { api } from "@/convex/_generated/api";
 import { on } from "events";
@@ -83,27 +90,36 @@ export const SearchCommand = () => {
       <CommandInput placeholder={`Search ${user?.fullName}'s workspace...`} />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
-
-        <CommandGroup heading="Uploaded Files">
-          {files?.map((file) => (
-            <CommandItem
-              key={file._id}
-              value={`${file._id}-${file.fileName}`}
-              title={file.fileName}
-              className="flex justify-between"
-            >
-              <span onClick={() => onSelectFile(file._id)} className="truncate">
-                {file.fileName}
-              </span>
-              <div>
-                <Trash
-                  onClick={() => onDelete(file._id)}
-                  className=" h-2 w-2 hover:text-red-500"
-                />
-              </div>
-            </CommandItem>
-          ))}
-        </CommandGroup>
+        <TooltipProvider>
+          <Tooltip>
+            <CommandGroup heading="Uploaded Files">
+              {files?.map((file) => (
+                <CommandItem
+                  key={file._id}
+                  value={`${file._id}-${file.fileName}`}
+                  title={file.fileName}
+                  className="flex justify-between"
+                >
+                  <span
+                    onClick={() => onSelectFile(file._id)}
+                    className="truncate"
+                  >
+                    <TooltipTrigger>{file.fileName}</TooltipTrigger>
+                    <TooltipContent className="max-w-md break-words whitespace-normal">
+                      {file.summary}
+                    </TooltipContent>
+                  </span>
+                  <div>
+                    <Trash
+                      onClick={() => onDelete(file._id)}
+                      className=" h-2 w-2 hover:text-red-500"
+                    />
+                  </div>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </Tooltip>
+        </TooltipProvider>
       </CommandList>
     </CommandDialog>
   );

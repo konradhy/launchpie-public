@@ -61,6 +61,7 @@ export default defineSchema({
     taxId: v.string(),
     riskMultiplier: v.number(),
     totalPieValue: v.number(),
+    meetingAgenda: v.optional(v.string()),
 
     shareholders: v.optional(
       v.array(
@@ -168,7 +169,7 @@ export default defineSchema({
 
   files: defineTable({
     url: v.optional(v.string()),
-    text: v.optional(v.string()),
+    text: v.optional(v.string()), //not doing anything?
     storageId: v.string(),
     fileName: v.string(),
     userId: v.string(),
@@ -177,13 +178,14 @@ export default defineSchema({
     isArchived: v.boolean(),
     isPublished: v.boolean(),
     companyId: v.id("companies"),
+    summary: v.optional(v.string()),
   })
     .index("byUrl", ["url"])
     .index("byCompanyId", ["companyId"]),
 
   chunks: defineTable({
     fileId: v.optional(v.id("files")),
-    noteId: v.optional(v.id("notes")), //rename to noteId and update index
+    noteId: v.optional(v.id("notes")),
     taskId: v.optional(v.id("tasks")),
     text: v.string(),
     embeddingId: v.union(v.id("embeddings"), v.null()),

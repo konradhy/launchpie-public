@@ -15,6 +15,7 @@ import {
   HandCoins,
   LucideIcon,
   Settings,
+  Mic,
 } from "lucide-react";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { ElementRef, useEffect, useRef, useState } from "react";
@@ -154,7 +155,13 @@ export const Navigation = () => {
       variant: "default",
       link: "/dashboard",
     },
-    // "Stakes" link will be conditionally added
+    {
+      title: "New Meeting",
+      icon: Mic,
+      variant: "ghost",
+      link: "/meeting",
+    },
+
     {
       title: "Dollops",
       label: "85",

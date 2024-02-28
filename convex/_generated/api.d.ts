@@ -24,6 +24,7 @@ import type * as helpers_utils from "../helpers/utils.js";
 import type * as ingest_chunkers from "../ingest/chunkers.js";
 import type * as ingest_embed from "../ingest/embed.js";
 import type * as ingest_extract from "../ingest/extract.js";
+import type * as meetingAgenda from "../meetingAgenda.js";
 import type * as messages from "../messages.js";
 import type * as notes from "../notes.js";
 import type * as persons from "../persons.js";
@@ -53,6 +54,7 @@ declare const fullApi: ApiFromModules<{
   "ingest/chunkers": typeof ingest_chunkers;
   "ingest/embed": typeof ingest_embed;
   "ingest/extract": typeof ingest_extract;
+  meetingAgenda: typeof meetingAgenda;
   messages: typeof messages;
   notes: typeof notes;
   persons: typeof persons;

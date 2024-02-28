@@ -17,6 +17,7 @@ enum ErrorMessage {
   Notes = "You must be logged in to access notes.",
   CompanyInformation = "You must be logged in to access company information.",
   Records = "You must be logged in to access recordings.",
+  MeetingAgenda = "You must be logged in to access meeting agenda.",
 }
 
 export async function validateUserAndCompany(

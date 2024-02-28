@@ -1,7 +1,7 @@
 //refactor so that files trash works the same as notes trash/archve
 //refactor so that files are stored in a different table
 import { ConvexError, v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { internalMutation, mutation, query } from "./_generated/server";
 import { Id } from "./_generated/dataModel";
 import { internal } from "./_generated/api";
 
@@ -137,5 +137,17 @@ export const serveFile = query({
     const url = await ctx.storage.getUrl(file.storageId as Id<"_storage">);
 
     return url;
+  },
+});
+
+export const patchFileSummary = internalMutation({
+  args: {
+    id: v.id("files"),
+    summary: v.string(),
+  },
+  handler: async (ctx, { id, summary }) => {
+    await ctx.db.patch(id, {
+      summary: summary,
+    });
   },
 });
