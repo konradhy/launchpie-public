@@ -24,6 +24,6 @@ export const getCurrentStakes = query({
 
     //only include the tasks where the assignee is user.linkedPersonId
 
-    return filteredTasks;
+    return filteredTasks.slice(0, 10);
   },
 });

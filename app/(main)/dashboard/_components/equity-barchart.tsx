@@ -4,7 +4,6 @@ import { ResponsiveLine } from "@nivo/line";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Spinner } from "@/components/spinner";
-import { Doc } from "@/convex/_generated/dataModel";
 
 export const EquityBarchart = () => {
   const lineData = useQuery(api.dashboard.equityPie.equityBarchart);
@@ -21,8 +20,7 @@ export const EquityBarchart = () => {
     <div className=" p-4 rounded-lg shadow-inner ">
       <h1 className="font-semibold text-2xl">Equity Growth</h1>
       <p className=" text-gray-500 text-sm">
-        A monthly view of cumulative equity value and individual shareholder
-        efforts
+        A monthly view of equity value and individual shareholder efforts
       </p>
       <div className="h-[120px] md:h-[345px]">
         <ResponsiveLine

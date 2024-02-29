@@ -17,7 +17,7 @@ import { Metadata } from "next";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import RecentSales from "./_components/recent-stakes";
+import RecentStakes from "./_components/recent-stakes";
 import { Search } from "./_components/search";
 import EquityCard from "./_components/equity-card";
 import { appName } from "@/lib/utils";
@@ -59,9 +59,11 @@ export default function DashboardPage() {
           <div className="space-y-4">
             <EquityCardArea />
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-              <RecentSales />
+              <div className="col-span-4">
+                <RecentStakes />
+              </div>
 
-              <div className="col-span-4 bg-primary/5 dark:bg-slate-800 overflow-y-auto  rounded-lg shadow-inner dark:bg-background">
+              <div className="col-span-3 bg-primary/5 dark:bg-slate-800 overflow-y-auto  rounded-lg shadow-inner dark:bg-background">
                 <div className="flex flex-col items-center justify-center pt-4 pb-2 h-[25rem]">
                   <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">
                     Launch Pie
@@ -69,10 +71,10 @@ export default function DashboardPage() {
                   <EquityPie />
                 </div>
               </div>
-              <div className="col-span-4 dark:bg-slate-800 overflow-y-auto bg-primary/5 rounded-lg shadow-inner dark:bg-background">
+              <div className="col-span-3 dark:bg-slate-800 overflow-y-auto bg-primary/5 rounded-lg shadow-inner dark:bg-background">
                 <EquityBarchart />
               </div>
-              <div className="col-span-3">
+              <div className="col-span-4">
                 <CompanyDetailsCard />
               </div>
             </div>

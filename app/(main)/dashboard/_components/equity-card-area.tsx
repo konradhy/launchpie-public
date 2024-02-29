@@ -6,7 +6,7 @@ import EquityCard from "./equity-card";
 import { Spinner } from "@/components/spinner";
 
 const EquityCardArea = () => {
-  const equityData = useQuery(api.dashboard.equityCard.equityCards);
+  const equityData = useQuery(api.dashboard.equityCard.equityDetails);
 
   if (!equityData) {
     return <Spinner></Spinner>;

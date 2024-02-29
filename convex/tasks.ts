@@ -120,6 +120,7 @@ export const getByCompanyId = query({
       .query("tasks")
       .withIndex("by_company", (q) => q.eq("companyId", company._id))
       .filter((q) => q.eq(q.field("isArchived"), false))
+      .order("desc")
       .take(100); //do some type of pagination solution otherwise switch to collect/all
     return tasks;
   },

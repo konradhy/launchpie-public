@@ -8,7 +8,7 @@ import { Doc } from "@/convex/_generated/dataModel";
 
 const TaskCard = ({ task, detail }: { task: string; detail: string }) => {
   return (
-    <div className="bg-primary/10 p-2 rounded-lg mb-2 last:mb-0 shadow-inner hover:bg-primary/20 dark:hover:bg-gray-700 cursor-pointer dark:bg-gray-800">
+    <div className="max-w-[25rem] bg-primary/10 p-2 rounded-lg mb-2 last:mb-0 shadow-inner hover:bg-primary/20 dark:hover:bg-gray-700 cursor-pointer dark:bg-gray-800">
       <p className="text-sm font-semibold truncate">{task}</p>
       <p className="text-xs text-gray-500 truncate">{detail}</p>
     </div>
@@ -33,7 +33,7 @@ const EquityCard = ({
       <CardHeader className="px-4 py-2 bg-slate-50 dark:bg-slate-800">
         <div className="flex justify-between items-center">
           <span className="text-xs font-medium text-gray-500 dark:text-gray-100 truncate">
-            Equity:{" "}
+            Fair Market Value:{" "}
             <span>
               {new Intl.NumberFormat("en-US", {
                 style: "currency",

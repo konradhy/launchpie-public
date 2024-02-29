@@ -11,6 +11,9 @@ interface MonthlyGroup {
   totalEquity: number;
 }
 
+//redo so that i first grab the company tasks
+//then i follow the method i used for equitycards to calculate the equity
+//i remove the fields for personalequityvalue and equity percentage and calculate that dynamically
 export const equityPie = query({
   handler: async (ctx) => {
     const { company } = await validateUserAndCompany(ctx, "CompanyInformation");

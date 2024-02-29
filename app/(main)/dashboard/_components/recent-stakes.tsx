@@ -58,20 +58,18 @@ export default function Component() {
   }
 
   return (
-    <div className="w-full max-w-3xl mx-auto col-span-3">
-      <Card className="overflow-y-auto bg-gray-50 rounded-lg shadow-inner dark:bg-background">
-        <CardHeader>
-          <CardTitle>Current Stakes</CardTitle>
-          <CardDescription>Stakes that need to be completed </CardDescription>
-        </CardHeader>
-        <ScrollArea className=" h-[120px] md:h-[345px]  ">
-          <CardContent className="grid gap-4">
-            {tasks.map((task, index) => (
-              <TaskCard key={index} task={task} />
-            ))}
-          </CardContent>
-        </ScrollArea>
-      </Card>
-    </div>
+    <Card className=" bg-gray-50 rounded-lg shadow-inner dark:bg-background">
+      <CardHeader>
+        <CardTitle>Current Stakes</CardTitle>
+        <CardDescription>Stakes that need to be completed </CardDescription>
+      </CardHeader>
+      <ScrollArea className=" h-[120px] md:h-[345px]  ">
+        <CardContent className="grid gap-4">
+          {tasks.map((task, index) => (
+            <TaskCard key={index} task={task} />
+          ))}
+        </CardContent>
+      </ScrollArea>
+    </Card>
   );
 }

@@ -6,30 +6,48 @@ import { api } from "@/convex/_generated/api";
 import { Spinner } from "@/components/spinner";
 import { ResponsivePieCanvas } from "@nivo/pie";
 
-export const transformEquityPieData = (equityPie: any) => {
-  if (!equityPie) return [];
-
-  return equityPie.map((shareholder: any, index: number) => {
-    const hue = (index * 360) / equityPie.length;
-    return {
-      id:
-        `  ${shareholder?.name} - ${Math.round(shareholder?.equityPercentage)}% ` ||
-        `unknown-${index}`,
-      label: shareholder?.name || `Unknown`,
-      value: Math.round(shareholder?.personalEquityValue) || 0,
-
-      color: `hsl(${hue}, 70%, 50%)`,
-    };
-  });
+type EquityDetails = {
+  [key: string]: {
+    totalEquityValue: number;
+    firstName: string;
+    lastName: string;
+  };
 };
 
+function transformEquityDetails(equityDetails: EquityDetails | undefined) {
+  if (!equityDetails) return [];
+
+  return Object.values(equityDetails).map((detail) => ({
+    id: `${detail.firstName} ${detail.lastName.charAt(0)}.`, // Generates a random ID.
+    label: detail.firstName,
+    value: detail.totalEquityValue,
+    color: `hsl(${Math.random() * 360}, 70%, 50%)`,
+  }));
+}
+
 const EquityPie = () => {
-  const equityPie = useQuery(api.dashboard.equityPie.equityPie);
-  if (!equityPie) {
+  const equityDetails = useQuery(api.dashboard.equityCard.equityDetails);
+
+  if (!equityDetails) {
     return <Spinner />;
   }
 
-  const transformedData = transformEquityPieData(equityPie);
+  const simplifiedEquityDetails = Object.entries(equityDetails).reduce(
+    (acc, [key, { firstName, lastName, totalEquityValue }]) => {
+      acc[key] = { firstName, lastName, totalEquityValue };
+      return acc;
+    },
+    {} as {
+      [key: string]: {
+        firstName: string;
+        lastName: string;
+        totalEquityValue: number;
+      };
+    },
+  );
+
+  const transformedData = transformEquityDetails(simplifiedEquityDetails);
+  console.log(transformedData);
 
   return (
     <ResponsivePieCanvas
@@ -50,77 +68,6 @@ const EquityPie = () => {
       arcLinkLabelsColor={{ from: "color" }}
       arcLabelsSkipAngle={10}
       arcLabelsTextColor="#333333"
-      // @ts-expect-error
-      defs={[
-        {
-          id: "dots",
-          type: "patternDots",
-          background: "inherit",
-          color: "rgba(255, 255, 255, 0.3)",
-          size: 4,
-          padding: 1,
-          stagger: true,
-        },
-        {
-          id: "lines",
-          type: "patternLines",
-          background: "inherit",
-          color: "rgba(255, 255, 255, 0.3)",
-          rotation: -45,
-          lineWidth: 6,
-          spacing: 10,
-        },
-      ]}
-      fill={[
-        {
-          match: {
-            id: "ruby",
-          },
-          id: "dots",
-        },
-        {
-          match: {
-            id: "c",
-          },
-          id: "dots",
-        },
-        {
-          match: {
-            id: "go",
-          },
-          id: "dots",
-        },
-        {
-          match: {
-            id: "python",
-          },
-          id: "dots",
-        },
-        {
-          match: {
-            id: "scala",
-          },
-          id: "lines",
-        },
-        {
-          match: {
-            id: "lisp",
-          },
-          id: "lines",
-        },
-        {
-          match: {
-            id: "elixir",
-          },
-          id: "lines",
-        },
-        {
-          match: {
-            id: "javascript",
-          },
-          id: "lines",
-        },
-      ]}
       legends={[
         {
           anchor: "bottom",
