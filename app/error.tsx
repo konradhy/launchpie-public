@@ -22,7 +22,9 @@ const Error = () => {
         alt="Error"
         className="hidden dark:block"
       />
-      <h2 className="text-xl font-medium">Something went wrong!</h2>
+      <h2 className="text-xl font-medium">
+        Something went wrong! Please try again
+      </h2>
       <Button asChild>
         <Link href="/">Go back</Link>
       </Button>
