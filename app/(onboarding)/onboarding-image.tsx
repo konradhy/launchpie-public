@@ -1,6 +1,6 @@
 import Image from "next/image";
-import OnboardingBg from "/images/onboarding-image1.jpeg";
-import OnboardingDecoration from "/images/auth-decoration.png";
+import OnboardingBg from "@/public/images/onboarding-image1.jpeg";
+import OnboardingDecoration from "@/public/images/auth-decoration.png";
 
 export default function OnboardingImage() {
   return (
