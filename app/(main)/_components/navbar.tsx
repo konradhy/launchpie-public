@@ -25,7 +25,7 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 
-interface MailProps {
+interface NavbarProps {
   accounts: {
     label: string;
     email: string;
@@ -37,13 +37,13 @@ interface MailProps {
   navCollapsedSize: number;
 }
 
-export function Mail({
+export function Navbar({
   accounts,
 
   defaultLayout = [290, 480, 755],
   defaultCollapsed = false,
   navCollapsedSize,
-}: MailProps) {
+}: NavbarProps) {
   const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed);
 
   return (

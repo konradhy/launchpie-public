@@ -68,6 +68,14 @@ const EquityPie = () => {
       arcLinkLabelsColor={{ from: "color" }}
       arcLabelsSkipAngle={10}
       arcLabelsTextColor="#333333"
+      theme={{
+        tooltip: {
+          container: {
+            background: "#333333",
+            color: "#ffffff",
+          },
+        },
+      }}
       legends={[
         {
           anchor: "bottom",

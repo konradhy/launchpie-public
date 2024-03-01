@@ -11,10 +11,11 @@ export const EquityBarchart = () => {
   if (!lineData) {
     return <Spinner />;
   }
-
-  //this seems really important to get right
-  //@ts-ignore
-  const assigneeLines = transformDataForAssigneeEquity(lineData);
+  const currencyFormatter = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD", // Change to your preferred currency
+    minimumFractionDigits: 0, // Optional: Adjust according to your needs
+  });
 
   return (
     <div className=" p-4 rounded-lg shadow-inner ">
@@ -24,41 +25,66 @@ export const EquityBarchart = () => {
       </p>
       <div className="h-[120px] md:h-[345px]">
         <ResponsiveLine
-          data={assigneeLines}
+          data={lineData}
+          curve="monotoneX"
           margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
           xScale={{ type: "point" }}
           yScale={{
             type: "linear",
             min: "auto",
             max: "auto",
-            stacked: true,
+            stacked: false,
             reverse: false,
           }}
-          yFormat=" >-.2f"
           axisTop={null}
           axisRight={null}
           axisBottom={{
             tickSize: 5,
             tickPadding: 5,
-            tickRotation: 0,
-            legend: "Month",
-            legendOffset: 36,
+            tickRotation: 20,
+
             legendPosition: "middle",
           }}
           axisLeft={{
             tickSize: 5,
             tickPadding: 5,
             tickRotation: 0,
-            legend: "value",
-            legendOffset: -40,
+            format: (value) => currencyFormatter.format(value),
+            legendOffset: -10,
             legendPosition: "middle",
           }}
-          pointSize={10}
+          lineWidth={4}
+          pointSize={8}
           pointColor={{ theme: "background" }}
           pointBorderWidth={2}
           pointBorderColor={{ from: "serieColor" }}
           pointLabelYOffset={-12}
           useMesh={true}
+          theme={{
+            axis: {
+              ticks: {
+                text: {
+                  fill: "#c39e90",
+                },
+              },
+            },
+            grid: {
+              line: {
+                stroke: "#555555",
+              },
+            },
+            legends: {
+              text: {
+                fill: "#d66b6b", // Light text for legends
+              },
+            },
+            tooltip: {
+              container: {
+                background: "#333333",
+                color: "#ffffff",
+              },
+            },
+          }}
           legends={[
             {
               anchor: "bottom-right",
@@ -89,73 +115,4 @@ export const EquityBarchart = () => {
       </div>
     </div>
   );
-};
-
-type GroupedTasks = {
-  [key: string]: {
-    tasks: Array<{
-      title?: string;
-      description: string;
-      assignees: string[]; // Assuming this is an array of personIds
-      dueDate: string;
-      estimatedTime: number;
-      actualTime?: number;
-      taskState: "notStarted" | "inProgress" | "completed";
-      reviewStatus: "notFlagged" | "flagged" | "approved";
-      meetingAgendaFlag: boolean;
-      equityValue: number | 0;
-      notes?: string;
-      userId: string;
-      companyId: string; // Assuming this requires a string or specific ID format
-      createdAt: string;
-      updatedAt: string;
-      updatedBy: string;
-      category: string;
-      priority: "low" | "medium" | "high";
-      isArchived: boolean;
-    }>;
-  };
-};
-
-export const transformDataForAssigneeEquity = (
-  groupedTasks: GroupedTasks,
-): Array<{
-  id: string;
-  data: Array<{ x: string; y: number }>;
-}> => {
-  const assigneeLines: {
-    [assigneeId: string]: { id: string; data: Array<{ x: string; y: number }> };
-  } = {};
-
-  // Create a sorted list of all months from the keys in groupedTasks
-  const allMonths: string[] = Object.keys(groupedTasks).sort();
-
-  // Initialize assignee lines with zero values for all months
-  Object.keys(groupedTasks).forEach((monthYear) => {
-    groupedTasks[monthYear].tasks.forEach((task) => {
-      task.assignees.forEach((assigneeId) => {
-        if (!assigneeLines[assigneeId]) {
-          assigneeLines[assigneeId] = {
-            id: assigneeId,
-            data: allMonths.map((month) => ({ x: month, y: 0 })),
-          };
-        }
-        const dataIndex = assigneeLines[assigneeId].data.findIndex(
-          (dataPoint) => dataPoint.x === monthYear,
-        );
-        if (dataIndex !== -1) {
-          assigneeLines[assigneeId].data[dataIndex].y += task.equityValue;
-        }
-      });
-    });
-  });
-
-  // Round the y values for all assignees and all months
-  Object.values(assigneeLines).forEach((assigneeLine) => {
-    assigneeLine.data.forEach((dataPoint) => {
-      dataPoint.y = Math.round(dataPoint.y * 100) / 100; // Rounds to two decimal places
-    });
-  });
-
-  return Object.values(assigneeLines);
 };

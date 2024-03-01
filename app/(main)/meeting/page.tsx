@@ -1,4 +1,9 @@
 "use client";
+/*
+1. Add toast messages
+2. Improve design typography consistency and spacing
+3. Meeting agenda should be blank when you arrive, with a button. Upon clicking the button we track the state change and then generate the meeting agenda live using streaming
+*/
 
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
@@ -16,9 +21,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "sonner";
 const RecordVoicePage = () => {
   const [title, setTitle] = useState("Record your meeting");
+
+  const [checkedStates, setCheckedStates] = useState<{
+    [key: number]: boolean;
+  }>({});
 
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
@@ -102,10 +113,16 @@ const RecordVoicePage = () => {
   };
 
   const handleMeetingClick = async () => {
-    //toast
     await generateMeetingAgenda({
       instructions: "Follow best practices",
     });
+  };
+
+  const toggleCheck = (index: number): void => {
+    setCheckedStates((prevState) => ({
+      ...prevState,
+      [index]: !prevState[index],
+    }));
   };
 
   return (
@@ -137,16 +154,57 @@ const RecordVoicePage = () => {
       </Card>
 
       <Card className="w-full lg:w-1/2 dark:bg-gray-800 shadow-inner p-6 rounded-lg md:min-h-[50rem] bg-primary/5">
-        <CardHeader className="text-center">
-          <h2 className="text-2xl font-semibold dark:text-white">
-            Meeting Agenda
+        <CardHeader className="text-center ">
+          <h2 className="text-2xl font-semibold dark:text-white ">
+            {meetingAgenda?.meetingTitle || "Meeting Agenda"} for{" "}
+            {meetingAgenda?.companyName || "Company"}
           </h2>
         </CardHeader>
+        <CardDescription className="text-center mb-4">
+          Estimated Meeting Time: {meetingAgenda?.meetingDuration}
+        </CardDescription>
 
         <CardContent className="flex flex-col items-center justify-center">
-          <Button onClick={handleMeetingClick}>Generate Meeting agenda</Button>
-          <div className="p-4 "> {meetingAgenda}</div>
+          <ScrollArea className="w-full h-[30rem] overflow-y-auto">
+            {meetingAgenda?.topics?.map((topic, index) => (
+              <div key={index} className="mt-6 first:mt-0">
+                {" "}
+                {/* Reduced the top margin for each topic */}
+                <div className="flex items-start">
+                  <Checkbox
+                    onClick={() => toggleCheck(index)}
+                    className="mr-2 mt-[5px]"
+                  />
+                  <div className="flex flex-col justify-between">
+                    {" "}
+                    <h3
+                      className={`text-xl font-semibold dark:text-white mb-1 ${checkedStates[index] ? "line-through" : ""}`}
+                    >
+                      {topic.title}
+                    </h3>
+                    <span
+                      className={`mt-[-8px] text-xs font-light text-gray-600 dark:text-gray-400 ${checkedStates[index] ? "line-through" : ""}`}
+                    >
+                      ETA: {topic.allottedTime}
+                    </span>
+                  </div>
+                </div>
+                <p
+                  className={`ml-6 mt-2 dark:text-gray-300 ${checkedStates[index] ? "line-through" : ""}`}
+                >
+                  {topic.description}
+                </p>
+              </div>
+            ))}
+          </ScrollArea>
         </CardContent>
+        <CardFooter className="text-center mt-4">
+          <div className="flex justify-center mb-4">
+            <Button onClick={handleMeetingClick} className="text-lg px-4 py-2">
+              New Meeting Agenda Board
+            </Button>
+          </div>
+        </CardFooter>
       </Card>
     </div>
   );

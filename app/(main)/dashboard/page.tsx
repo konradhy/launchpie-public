@@ -27,6 +27,7 @@ import { ConvexAiChat } from "@/app/aiChat";
 import EquityPie from "./_components/equity-pie";
 import { EquityBarchart } from "./_components/equity-barchart";
 import EquityCardArea from "./_components/equity-card-area";
+import { NewStake } from "./_components/new-stake";
 
 export const metadata: Metadata = {
   title: `${appName} | Dashboard`,
@@ -51,8 +52,7 @@ export default function DashboardPage() {
                 A click triggers the modal. With the first input being in the search bar
                  */}
               </div>
-
-              <Button>New Stake</Button>
+              <NewStake />
             </div>
           </div>
 
@@ -71,10 +71,10 @@ export default function DashboardPage() {
                   <EquityPie />
                 </div>
               </div>
-              <div className="col-span-3 dark:bg-slate-800 overflow-y-auto bg-primary/5 rounded-lg shadow-inner dark:bg-background">
+              <div className="col-span-4 dark:bg-slate-800 overflow-y-auto bg-primary/5 rounded-lg shadow-inner dark:bg-background">
                 <EquityBarchart />
               </div>
-              <div className="col-span-4">
+              <div className="col-span-3">
                 <CompanyDetailsCard />
               </div>
             </div>

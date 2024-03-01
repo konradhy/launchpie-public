@@ -2,6 +2,20 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
+  meetingAgendas: defineTable({
+    companyId: v.id("companies"),
+    prompt: v.string(),
+    companyName: v.string(),
+    meetingTitle: v.string(),
+    meetingDuration: v.string(),
+    topics: v.array(
+      v.object({
+        title: v.string(),
+        description: v.string(),
+        allottedTime: v.string(),
+      }),
+    ),
+  }).index("by_companyId", ["companyId"]),
   records: defineTable({
     userId: v.string(),
     audioFileId: v.string(),

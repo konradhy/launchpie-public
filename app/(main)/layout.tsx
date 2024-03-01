@@ -4,8 +4,7 @@ import { useConvexAuth } from "convex/react";
 import { redirect } from "next/navigation";
 import React from "react";
 import { Navigation } from "./_components/navigation";
-import { Mail } from "./_components/navbar";
-import { Mail as Mailing } from "lucide-react";
+
 import { SearchCommand } from "@/components/search-command";
 import { ModalProvider } from "@/components/providers/modal-provider";
 

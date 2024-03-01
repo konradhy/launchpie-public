@@ -1,58 +1,9 @@
 import { ConvexError, v } from "convex/values";
-import { internalMutation, mutation, query } from "../_generated/server";
+import { query } from "../_generated/server";
 import { Doc, Id } from "../_generated/dataModel";
-import { internal } from "../_generated/api";
-import { asyncMap } from "modern-async";
+
 import { validateUserAndCompany } from "../helpers/utils";
 import { getAll } from "convex-helpers/server/relationships";
-
-interface MonthlyGroup {
-  tasks: Doc<"tasks">[];
-  totalEquity: number;
-}
-
-//redo so that i first grab the company tasks
-//then i follow the method i used for equitycards to calculate the equity
-//i remove the fields for personalequityvalue and equity percentage and calculate that dynamically
-export const equityPie = query({
-  handler: async (ctx) => {
-    const { company } = await validateUserAndCompany(ctx, "CompanyInformation");
-
-    if (!company.shareholders) {
-      throw new ConvexError("No shareholders found");
-    }
-
-    const totalPieEquityValue = company.totalPieValue;
-
-    const shareholderDetails = await Promise.all(
-      company.shareholders
-        .filter((shareholder) => shareholder.personId)
-        .map(async (shareholder) => {
-          const person = await ctx.db.get(shareholder.personId);
-          if (!person) {
-            return null;
-          }
-
-          const personalEquityValue = person.equity;
-
-          const equityPercentage =
-            totalPieEquityValue > 0
-              ? (personalEquityValue / totalPieEquityValue) * 100
-              : 0;
-
-          return {
-            shareholderId: shareholder.personId,
-            name: person.firstName,
-            equityPercentage: equityPercentage,
-            personalEquityValue: personalEquityValue,
-          };
-        }),
-    );
-
-    const validShareholderDetails = shareholderDetails.filter(Boolean); // Simpler filter for non-null
-    return validShareholderDetails;
-  },
-});
 
 export const equityBarchart = query({
   handler: async (ctx) => {
@@ -70,34 +21,153 @@ export const equityBarchart = query({
           .eq("companyId", company._id)
           .gte("updatedAt", twelveMonthsAgoISOString),
       )
+      .filter((q) => q.gt(q.field("equityValue"), 0))
       .collect();
 
-    const groupedTasks = groupTasksByMonthAndCalculateEquity(tasks);
+    const Ids = extractAssigneeIds(tasks) as Id<"persons">[];
+
+    const details = await getAll(ctx.db, Ids);
+
+    const nonNullDetails = details.filter(
+      (detail): detail is NonNullable<typeof detail> => detail !== null,
+    );
+
+    const groupedTasks = await calculateEquityByAssignee(tasks, nonNullDetails);
+
+    console.log(groupedTasks);
 
     return groupedTasks;
   },
 });
 
-function groupTasksByMonthAndCalculateEquity(tasks: Doc<"tasks">[]): {
-  [key: string]: MonthlyGroup;
-} {
-  const groupedTasks: { [key: string]: MonthlyGroup } = {};
+interface MonthlyEquityValue {
+  x: string;
+  y: number;
+}
 
-  tasks.forEach((task) => {
-    // Extract YYYY-MM part from updatedAt
-    const yearMonth = task.updatedAt.slice(0, 7);
+interface AssigneeEquityValue {
+  id: string;
+  data: MonthlyEquityValue[];
+}
 
-    // Initialize the month group if it doesn't exist
-    if (!groupedTasks[yearMonth]) {
-      groupedTasks[yearMonth] = { tasks: [], totalEquity: 0 };
-    }
+function formatMonth(month: string): string {
+  const [year, monthIndex] = month.split("-").map((num) => parseInt(num, 10));
+  const date = new Date(year, monthIndex - 1);
+  const formatter = new Intl.DateTimeFormat("en", {
+    month: "long",
+    year: "numeric",
+  });
+  return formatter.format(date);
+}
 
-    // Add the task to the month group
-    groupedTasks[yearMonth].tasks.push(task);
+function getLastTwelveMonths(): { value: string; name: string }[] {
+  let months: { value: string; name: string }[] = [];
+  let date = new Date();
+  date.setDate(1);
+  for (let i = 0; i < 12; i++) {
+    const monthValue = date.toISOString().substring(0, 7);
+    const monthName = formatMonth(monthValue);
+    months.unshift({ value: monthValue, name: monthName });
+    date.setMonth(date.getMonth() - 1);
+  }
+  return months;
+}
 
-    // Update the total equity for the month
-    groupedTasks[yearMonth].totalEquity += task.equityValue;
+async function calculateEquityByAssignee(
+  tasks: Doc<"tasks">[],
+  details: Doc<"persons">[],
+): Promise<AssigneeEquityValue[]> {
+  const lastTwelveMonths = getLastTwelveMonths();
+
+  const assigneeNameMap: Record<string, string> = {};
+  details.forEach((detail) => {
+    assigneeNameMap[detail._id] = `${detail.firstName} ${detail.lastName}`;
   });
 
-  return groupedTasks;
+  const assigneeEquityMap: Record<string, Record<string, number>> = {};
+
+  tasks.forEach((task) => {
+    const taskMonthValue = task.updatedAt.slice(0, 7);
+    const taskMonthName = formatMonth(taskMonthValue);
+    task.assignees.forEach((assigneeId) => {
+      const assigneeName = assigneeNameMap[assigneeId] || "Unknown Assignee";
+      if (!assigneeEquityMap[assigneeName]) {
+        assigneeEquityMap[assigneeName] = lastTwelveMonths.reduce(
+          (acc, month) => {
+            acc[month.name] = 0;
+            return acc;
+          },
+          {} as Record<string, number>,
+        );
+      }
+      if (assigneeEquityMap[assigneeName][taskMonthName] !== undefined) {
+        assigneeEquityMap[assigneeName][taskMonthName] += task.equityValue;
+      }
+    });
+  });
+
+  function sortMonthsChronologically(
+    a: { x: string; y: number },
+    b: { x: string; y: number },
+  ): number {
+    const monthOrder: Record<string, number> = {
+      January: 0,
+      February: 1,
+      March: 2,
+      April: 3,
+      May: 4,
+      June: 5,
+      July: 6,
+      August: 7,
+      September: 8,
+      October: 9,
+      November: 10,
+      December: 11,
+    };
+
+    const yearMonthA = a.x.split(" ");
+    const yearMonthB = b.x.split(" ");
+
+    const yearA = parseInt(yearMonthA[1], 10);
+    const yearB = parseInt(yearMonthB[1], 10);
+
+    if (yearA !== yearB) {
+      return yearA - yearB;
+    }
+
+    // If the years are the same, compare months using the monthOrder mapping
+    const monthA = monthOrder[yearMonthA[0]];
+    const monthB = monthOrder[yearMonthB[0]];
+
+    return monthA - monthB;
+  }
+
+  // Transform into array for frontend
+  const result: AssigneeEquityValue[] = Object.entries(assigneeEquityMap).map(
+    ([assigneeName, monthlyValues]) => ({
+      id: assigneeName,
+      data: Object.entries(monthlyValues)
+        .map(([monthName, value]) => ({
+          x: monthName,
+          y: value,
+        }))
+        .sort(sortMonthsChronologically),
+    }),
+  );
+
+  return result;
+}
+
+function extractAssigneeIds(tasks: Doc<"tasks">[]): string[] {
+  const allAssigneeIds: string[] = [];
+
+  tasks.forEach((task) => {
+    task.assignees.forEach((assigneeId) => {
+      if (!allAssigneeIds.includes(assigneeId)) {
+        allAssigneeIds.push(assigneeId);
+      }
+    });
+  });
+
+  return allAssigneeIds;
 }

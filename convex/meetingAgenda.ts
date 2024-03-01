@@ -30,6 +30,9 @@ export const generateMeetingAgenda = mutation({
       {
         instructions: "I have no custom instructions at this time",
         companyId: company._id,
+        companyName: company.companyName,
+        companyActivities: company.companyActivities,
+        companyIndustry: company.industry,
       },
     );
   },
@@ -48,7 +51,6 @@ export const getMeetingAgendaTasks = internalQuery({
       .filter((q) => q.neq(q.field("taskState"), "completed"))
       .collect();
 
-    console.log(meetingTasks);
     return meetingTasks;
   },
 });
@@ -57,10 +59,21 @@ export const patchMeetingAgenda = internalMutation({
   args: {
     companyId: v.id("companies"),
     meetingAgenda: v.string(),
+    prompt: v.string(),
   },
-  handler: async (ctx, { companyId, meetingAgenda }) => {
-    console.log("patchMeetingAgenda");
-    console.log(companyId, meetingAgenda);
+  handler: async (ctx, { companyId, meetingAgenda, prompt }) => {
+    //parse the meeting agenda
+    const parsedMeetingAgenda = JSON.parse(meetingAgenda);
+
+    await ctx.db.insert("meetingAgendas", {
+      companyId,
+      prompt,
+      topics: parsedMeetingAgenda.topics,
+      meetingTitle: parsedMeetingAgenda.meetingTitle,
+      meetingDuration: parsedMeetingAgenda.meetingDuration,
+      companyName: parsedMeetingAgenda.companyName,
+    });
+
     await ctx.db.patch(companyId, {
       meetingAgenda: meetingAgenda,
     });
@@ -75,7 +88,11 @@ export const getMeetingAgenda = query({
       "MeetingAgenda",
     );
 
-    const currentCompany = await ctx.db.get(company._id);
-    return company.meetingAgenda;
+    const meetingAgenda = await ctx.db
+      .query("meetingAgendas")
+      .withIndex("by_companyId", (q) => q.eq("companyId", company._id))
+      .order("desc")
+      .first();
+    return meetingAgenda;
   },
 });
