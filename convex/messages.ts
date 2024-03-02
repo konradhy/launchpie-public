@@ -25,7 +25,7 @@ export const send = mutation({
     console.log("send message");
     const identity = await ctx.auth.getUserIdentity();
     console.log("identity", identity);
-    const { company } = await validateUserAndCompanyMutations(ctx, "Files");
+    const { company } = await validateUserAndCompanyMutations(ctx, "Messages");
 
     await ctx.db.insert("messages", {
       isViewer: true,

@@ -51,6 +51,12 @@ const EquityPie = () => {
 
   return (
     <ResponsivePieCanvas
+      valueFormat={(value) =>
+        new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+        }).format(value)
+      }
       data={transformedData}
       margin={{ top: 10, right: 120, bottom: 50, left: 120 }}
       innerRadius={0.5}
@@ -81,7 +87,7 @@ const EquityPie = () => {
           anchor: "bottom",
           direction: "row",
           justify: false,
-          translateX: 0,
+
           translateY: 47,
           itemsSpacing: 15,
           itemWidth: 60,

@@ -4,12 +4,21 @@ import { ResponsiveLine } from "@nivo/line";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Spinner } from "@/components/spinner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const EquityBarchart = () => {
   const lineData = useQuery(api.dashboard.equityPie.equityBarchart);
 
   if (!lineData) {
-    return <Spinner />;
+    return (
+      <div className="p-4 rounded-lg shadow-inner">
+        <h1 className="font-semibold text-2xl">Equity Growth</h1>
+        <p className="text-gray-500 text-sm">
+          A monthly view of equity value and individual shareholder efforts
+        </p>
+        <div className="h-[120px] md:h-[345px]"></div>
+      </div>
+    );
   }
   const currencyFormatter = new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -28,7 +37,8 @@ export const EquityBarchart = () => {
           data={lineData}
           curve="monotoneX"
           margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
-          xScale={{ type: "point" }}
+          //@ts-expect-error
+          yFormat={(value) => currencyFormatter.format(value)}
           yScale={{
             type: "linear",
             min: "auto",
@@ -36,14 +46,10 @@ export const EquityBarchart = () => {
             stacked: false,
             reverse: false,
           }}
-          axisTop={null}
-          axisRight={null}
           axisBottom={{
             tickSize: 5,
             tickPadding: 5,
             tickRotation: 20,
-
-            legendPosition: "middle",
           }}
           axisLeft={{
             tickSize: 5,
@@ -91,9 +97,7 @@ export const EquityBarchart = () => {
               direction: "column",
               justify: false,
               translateX: 100,
-              translateY: 0,
-              itemsSpacing: 0,
-              itemDirection: "left-to-right",
+
               itemWidth: 80,
               itemHeight: 20,
               itemOpacity: 0.75,

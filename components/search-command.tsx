@@ -24,16 +24,20 @@ import {
 } from "@/components/ui/tooltip";
 import { useSearch } from "@/hooks/use-search";
 import { api } from "@/convex/_generated/api";
-import { on } from "events";
+
 import { Id } from "@/convex/_generated/dataModel";
 
 export const SearchCommand = () => {
   const { user } = useUser();
   const router = useRouter();
-  //const documents = useQuery(api.documents.getSearch);
+
   const files = useQuery(api.files.getSearch);
   const archiveFile = useMutation(api.files.archive);
   const [isFileId, setIsFileId] = useState<Id<"files">>();
+
+  const notes = useQuery(api.notes.getSearch);
+  const archiveNote = useMutation(api.notes.archive);
+  const [isNoteId, setIsNoteId] = useState<Id<"notes">>();
 
   const serveFile = useQuery(
     api.files.serveFile,
@@ -61,17 +65,20 @@ export const SearchCommand = () => {
     return () => document.removeEventListener("keydown", down);
   }, [toggle]);
 
-  const onSelect = (id: string) => {
-    router.push(`/documents/${id}`);
-    onClose();
+  const onDeleteFile = (id: Id<"files">) => {
+    archiveFile({ id });
   };
 
-  const onDelete = (id: Id<"files">) => {
-    archiveFile({ id });
+  const onDeleteNote = (id: Id<"notes">) => {
+    archiveNote({ id });
   };
 
   const onSelectFile = (id: Id<"files">) => {
     setIsFileId(id);
+  };
+  const onSelectNote = (id: string) => {
+    router.push(`/notes/${id}`);
+    onClose();
   };
 
   useEffect(() => {
@@ -84,16 +91,16 @@ export const SearchCommand = () => {
   if (!isMounted) {
     return null;
   }
-
   return (
-    <CommandDialog open={isOpen} onOpenChange={onClose}>
-      <CommandInput placeholder={`Search ${user?.fullName}'s workspace...`} />
-      <CommandList>
-        <CommandEmpty>No results found.</CommandEmpty>
-
-        <CommandGroup heading="Uploaded Files">
-          <TooltipProvider>
-            <Tooltip>
+    <TooltipProvider>
+      <Tooltip>
+        <CommandDialog open={isOpen} onOpenChange={onClose}>
+          <CommandInput
+            placeholder={`Search ${user?.fullName}'s workspace...`}
+          />
+          <CommandList>
+            <CommandEmpty>No results found</CommandEmpty>
+            <CommandGroup heading="Uploaded Files">
               {files?.map((file, index) => (
                 <CommandItem
                   key={file._id}
@@ -105,25 +112,37 @@ export const SearchCommand = () => {
                     onClick={() => onSelectFile(file._id)}
                     className="truncate"
                   >
-                    <TooltipTrigger id={file.fileName + index}>
+                    <TooltipTrigger id={file._id + index}>
                       {file.fileName}
                     </TooltipTrigger>
+                    <TooltipContent className="max-w-md break-words whitespace-normal">
+                      {file.summary}
+                    </TooltipContent>
                   </span>
                   <div>
                     <Trash
-                      onClick={() => onDelete(file._id)}
+                      onClick={() => onDeleteFile(file._id)}
                       className=" h-2 w-2 hover:text-red-500"
                     />
                   </div>
-                  <TooltipContent className="max-w-md break-words whitespace-normal">
-                    {file.summary}
-                  </TooltipContent>
                 </CommandItem>
               ))}
-            </Tooltip>
-          </TooltipProvider>
-        </CommandGroup>
-      </CommandList>
-    </CommandDialog>
+            </CommandGroup>
+            <CommandGroup heading="Notes">
+              {notes?.map((note) => (
+                <CommandItem key={note._id} value={note._id} title={note.title}>
+                  <span
+                    onClick={() => onSelectNote(note._id)}
+                    className="truncate"
+                  >
+                    {note.title}
+                  </span>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </CommandDialog>
+      </Tooltip>
+    </TooltipProvider>
   );
 };

@@ -12,6 +12,7 @@ import { AvatarImage, AvatarFallback, Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Spinner } from "@/components/spinner";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Doc } from "@/convex/_generated/dataModel";
 
 interface TaskCardProps {
@@ -54,7 +55,19 @@ export default function Component() {
   const tasks = useQuery(api.dashboard.currentStakes.getCurrentStakes);
 
   if (!tasks) {
-    return <Spinner></Spinner>;
+    return (
+      <Card className=" bg-gray-50 rounded-lg shadow-inner dark:bg-background">
+        <CardHeader>
+          <CardTitle>Current Stakes</CardTitle>
+          <CardDescription>Stakes that need to be completed </CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4">
+          <Skeleton className="h-20 dark:bg-slate-800" />
+          <Skeleton className="h-20 dark:bg-slate-800" />
+          <Skeleton className="h-20 dark:bg-slate-800" />
+        </CardContent>
+      </Card>
+    );
   }
 
   return (

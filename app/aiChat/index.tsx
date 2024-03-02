@@ -1,10 +1,5 @@
 "use client";
-import {
-  ConvexProvider,
-  ConvexReactClient,
-  useMutation,
-  useQuery,
-} from "convex/react";
+import { ConvexReactClient, useMutation, useQuery } from "convex/react";
 import {
   FormEvent,
   ReactNode,
@@ -136,7 +131,6 @@ export function Dialog({
   const handleSend = async (event: FormEvent) => {
     event.preventDefault();
 
-    //send companyId from client
     await sendMessage({ message: input, sessionId });
     setInput("");
     setScrolled(false);

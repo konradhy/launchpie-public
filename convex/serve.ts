@@ -37,9 +37,36 @@ export const answer = internalAction({
       embeddingIds: searchResults.map(({ _id }) => _id),
     });
 
+    // grab the last shareholder value
+    //grab the company details
+
+    const company = await ctx.runQuery(internal.companies.getByIdInternal, {
+      id: companyId,
+    });
+
+    const groupedTasks = await ctx.runQuery(
+      internal.dashboard.equityCard.internalEquityDetails,
+      {
+        id: companyId,
+      },
+    );
     const messageId = await ctx.runMutation(internal.serve.addBotMessage, {
       sessionId,
     });
+
+    const mapGroupedTasksToString = (
+      //@ts-ignore
+      groupedTasks,
+    ) =>
+      Object.entries(groupedTasks)
+        .map(
+          //@ts-ignore
+          ([key, { totalEquityValue, firstName, lastName }]) =>
+            `Key: ${key}, Total EquityValue: ${totalEquityValue}, First Name: ${firstName}, Last Name: ${lastName}`,
+        )
+        .join("\n");
+
+    const shareholderInfo = mapGroupedTasksToString(groupedTasks);
 
     try {
       const openai = new OpenAI();
@@ -53,7 +80,8 @@ export const answer = internalAction({
               "Answer the user question based on the provided documents. These documents will be from the tasks database, the upload database or the notes database. Check the heading to know which one.  " +
               "or report that the question cannot be answered based on " +
               "these documents. Keep the answer informative but brief, " +
-              "do not enumerate all possibilities.",
+              "do not enumerate all possibilities. " +
+              `While answering the questions you should note the following. The company name is ${company?.companyName}, they are in ${company?.industry}, and engage in the following activities: ${company?.companyActivities}. Note the current, accurate shareholder information, that is their ID, their names and their current total equity value in dollars: ${shareholderInfo} `,
           },
           ...(relevantDocuments.map(({ text }) => ({
             role: "system",
@@ -79,7 +107,7 @@ export const answer = internalAction({
     } catch (error: any) {
       await ctx.runMutation(internal.serve.updateBotMessage, {
         messageId,
-        text: "I think I'm sick. I can't respond right now. Please reach out to support at support@launchpie.com",
+        text: "I'm a bit confused. I can't respond right now. Please reach out to support at support@launchpie.com",
       });
       throw error;
     }

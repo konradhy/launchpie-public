@@ -1,11 +1,5 @@
 "use client";
 
-// run a scheudler / action to use openAi to generate the title of the task. Because openAI takes some time, insert immediately first then update the title. Or maybe this can be done with optimistic ui
-// In reality I want it more advanced but for this use case  I only need to add the estimaated hrs which I can sort, assignees which work like status and priority
-// Clicking on the task brings me to the task page (later feature)
-
-// Build task page, which is a modal that pops out as an editable form
-
 import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
 import { Id } from "@/convex/_generated/dataModel";

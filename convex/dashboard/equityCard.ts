@@ -1,5 +1,5 @@
 import { Doc, Id } from "../_generated/dataModel";
-import { query } from "../_generated/server";
+import { internalQuery, query } from "../_generated/server";
 import { validateUserAndCompany } from "../helpers/utils";
 import { getAll } from "convex-helpers/server/relationships";
 
@@ -10,6 +10,29 @@ export const equityDetails = query({
     const tasks = await ctx.db
       .query("tasks")
       .withIndex("by_company", (q) => q.eq("companyId", company._id))
+      .filter((q) => q.gt(q.field("equityValue"), 0))
+      .order("desc")
+      .collect();
+
+    const Ids = extractAssigneeIds(tasks) as Id<"persons">[];
+
+    const details = await getAll(ctx.db, Ids);
+
+    const filteredDetails = details.filter(
+      (detail) => detail !== null,
+    ) as Doc<"persons">[];
+
+    const groupedTasks = groupTasksByAssignee(tasks, filteredDetails);
+
+    return groupedTasks;
+  },
+});
+
+export const internalEquityDetails = internalQuery({
+  handler: async (ctx, { id }: { id: Id<"companies"> }) => {
+    const tasks = await ctx.db
+      .query("tasks")
+      .withIndex("by_company", (q) => q.eq("companyId", id))
       .filter((q) => q.gt(q.field("equityValue"), 0))
       .order("desc")
       .collect();

@@ -1,5 +1,6 @@
 import { v, ConvexError } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { internalQuery, mutation, query } from "./_generated/server";
+import { Id } from "./_generated/dataModel";
 
 export const create = mutation({
   args: {
@@ -361,5 +362,11 @@ export const getByUserId = query({
     }
 
     return company;
+  },
+});
+
+export const getByIdInternal = internalQuery({
+  handler: async (ctx, { id }: { id: Id<"companies"> }) => {
+    return await ctx.db.get(id);
   },
 });

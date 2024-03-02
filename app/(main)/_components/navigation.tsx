@@ -35,6 +35,7 @@ import { useSettings } from "@/hooks/use-settings";
 import { ConvexAiChat } from "@/app/aiChat";
 import { Button } from "@/components/ui/button";
 import { NotesNav } from "./notes/notes-nav";
+import path from "path";
 interface NavLink {
   title: string;
   label?: string;
@@ -43,6 +44,7 @@ interface NavLink {
   onClick?: () => void;
   link?: string;
   hotkey?: string;
+  name?: string;
 }
 
 export const Navigation = () => {
@@ -148,18 +150,20 @@ export const Navigation = () => {
     }
   };
 
-  let topLinks: NavLink[] = [
+  let initialTopLinks: NavLink[] = [
     {
       title: "Home",
       icon: Home,
       variant: "default",
       link: "/dashboard",
+      name: "dashboard",
     },
     {
       title: "New Meeting",
       icon: Mic,
       variant: "ghost",
       link: "/meeting",
+      name: "meeting",
     },
 
     {
@@ -167,9 +171,10 @@ export const Navigation = () => {
       label: "85",
       icon: HandCoins,
       variant: "ghost",
+      name: "dollops",
     },
     {
-      title: "Files",
+      title: "Search",
       label: "23",
       icon: Folder,
       variant: "ghost",
@@ -181,31 +186,28 @@ export const Navigation = () => {
       icon: NotebookPen,
       variant: "ghost",
       link: "/notes",
+      name: "notes",
     },
   ];
 
   if (company && company._id) {
-    topLinks.splice(1, 0, {
+    initialTopLinks.splice(1, 0, {
       title: "Stakes",
       label: "85",
       icon: ClipboardList,
       variant: "ghost",
       link: "/stakes",
+      name: "stakes",
     });
   }
 
-  let middleLinks: NavLink[] = [
+  let initialMiddleLinks: NavLink[] = [
     {
       title: "Upload File",
       icon: UploadCloud,
 
       variant: "ghost",
       onClick: fileUpload.onOpen,
-    },
-    {
-      title: "Ai Chat",
-      icon: Bot,
-      variant: "ghost",
     },
 
     {
@@ -216,7 +218,7 @@ export const Navigation = () => {
   ];
 
   if (company && company._id) {
-    middleLinks.splice(1, 0, {
+    initialMiddleLinks.splice(1, 0, {
       title: "New Stake",
       icon: Plus,
       hotkey: "S",
@@ -226,7 +228,7 @@ export const Navigation = () => {
     });
   }
 
-  let bottomLinks: NavLink[] = [
+  let initialBottomLinks: NavLink[] = [
     {
       title: "Settings",
       icon: Settings,
@@ -234,6 +236,25 @@ export const Navigation = () => {
       onClick: settings.onOpen,
     },
   ];
+
+  const [topLinks, setTopLinks] = useState(initialTopLinks);
+  const [middleLinks, setMiddleLinks] = useState(initialMiddleLinks);
+  const [bottomLinks, setBottomLinks] = useState(initialBottomLinks);
+
+  useEffect(() => {
+    const updateLinkVariants = (links: NavLink[]) => {
+      return links.map((link) => ({
+        ...link,
+        variant:
+          link.name && pathname.includes(link.name) ? "default" : "ghost",
+      }));
+    };
+
+    //@ts-ignore
+    setTopLinks(updateLinkVariants(initialTopLinks)); //@ts-ignore
+    setMiddleLinks(updateLinkVariants(initialMiddleLinks)); //@ts-ignore
+    setBottomLinks(updateLinkVariants(initialBottomLinks));
+  }, [pathname, company]);
 
   return (
     <>
@@ -294,7 +315,7 @@ export const Navigation = () => {
               welcomeMessage="Hey there, what can I help you with?"
               renderTrigger={(onClick) => (
                 <div
-                  className="flex items-center justify-center h-12 w-full hover:text-primary/60 text-primary   dark:text-secondary dark:hover:text-secondary/60 rounded-md cursor-pointer  transition-all"
+                  className="flex items-center justify-center h-12 w-full hover:text-primary/60  dark:hover:text-secondary/60 rounded-md cursor-pointer  transition-all"
                   onClick={onClick}
                 >
                   {isIconised ? (
