@@ -1,29 +1,14 @@
-/*
-To do
-1. Add a bar chart and a pie chart. The bar chart will go where the compani details is now and will show monthly
- contributions. The pie chart will go to the bottom left or right with the company detials beside it will show the equity
-
- 2. Grab the last 5 tasks by userId for each user and display it in the equty card. This Can be one call where we just grab the last 100 company tasks and filter it. Think through the process
- 3. Load current stakes with the logged in users current tasks
- 4. Set the min height and width of the imports so that they allign both vertically and horizontally during responsibe viewing
- 5. Set up the search bar to open a new module that searches for anything in the database
- 6. Wire up the newstake button. It should be it's own component that i just import
-
-
-*/
-// "use client";
 
 import { Metadata } from "next";
 
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+
 import RecentStakes from "./_components/recent-stakes";
 import { Search } from "./_components/search";
-import EquityCard from "./_components/equity-card";
+
 import { appName } from "@/lib/utils";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+
 import CompanyDetailsCard from "./_components/_company-details/company-details";
-import { ConvexAiChat } from "@/app/aiChat";
+
 import EquityPie from "./_components/equity-pie";
 import { EquityBarchart } from "./_components/equity-barchart";
 import EquityCardArea from "./_components/equity-card-area";

@@ -1,5 +1,3 @@
-//grab the tasks with your Id
-//Filter out the completed
 
 import { Doc, Id } from "../_generated/dataModel";
 import { query } from "../_generated/server";
@@ -22,7 +20,7 @@ export const getCurrentStakes = query({
       task.assignees.includes(user?.linkedPersonId!),
     );
 
-    //only include the tasks where the assignee is user.linkedPersonId
+  
 
     return filteredTasks.slice(0, 10);
   },

@@ -16,11 +16,11 @@ import OnboardingHeader from "../onboarding-header";
 
 import OnboardingProgress from "../onboarding-progress";
 
-import { InfoCircledIcon } from "@radix-ui/react-icons";
+
 import {
   Form,
   FormControl,
-  FormDescription,
+
   FormField,
   FormItem,
   FormLabel,

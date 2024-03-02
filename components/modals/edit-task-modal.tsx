@@ -1,7 +1,7 @@
 "use client";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { useEditTask } from "@/hooks/use-edit-task";
-import { NewTaskForm } from "@/components/new-task-form";
+
 import { Spinner } from "../spinner";
 import { EditTaskForm } from "../edit-task-form";
 

@@ -47,7 +47,7 @@ const EquityPie = () => {
   );
 
   const transformedData = transformEquityDetails(simplifiedEquityDetails);
-  console.log(transformedData);
+
 
   return (
     <ResponsivePieCanvas

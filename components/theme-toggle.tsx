@@ -9,7 +9,7 @@ export function ThemeToggle() {
     setIsClient(true);
   }, []);
 
-  // Render nothing on the server
+
   if (!isClient) return null;
 
   return (

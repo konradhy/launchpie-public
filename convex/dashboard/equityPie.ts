@@ -34,7 +34,7 @@ export const equityBarchart = query({
 
     const groupedTasks = await calculateEquityByAssignee(tasks, nonNullDetails);
 
-    console.log(groupedTasks);
+
 
     return groupedTasks;
   },

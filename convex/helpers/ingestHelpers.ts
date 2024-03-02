@@ -97,7 +97,7 @@ export async function processDeletion(
     .collect();
 
   for (const match of matches) {
-    console.log("attempt here to delete embeddings");
+
     await ctx.db.delete(match._id);
   }
 
@@ -108,7 +108,7 @@ export async function processDeletion(
     .collect();
 
   for (const match of chunkMatches) {
-    console.log("attempt here to delete chunks that are not embedded");
+  
     await ctx.db.delete(match._id);
   }
 }

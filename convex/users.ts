@@ -29,8 +29,7 @@ export const store = mutation({
       }
       return user._id;
     }
-    // So I need to fix this up
-    //I no longer use these calue
+
     return await ctx.db.insert("users", {
       name: identity.name!,
       tokenIdentifier: identity.tokenIdentifier,
@@ -41,16 +40,6 @@ export const store = mutation({
   },
 });
 
-//Used when the user has either (a) just created a company and checked yes this shareholder is me in the onbarding, (b) Click settings -> associated users -> this is me
-//(c) just clicked the create new account button. I.e. creating an account for the first time. Maybe this is the same point as (a)
-
-//It runs when you click the create new account button.
-/*
-By allowing
-
-
-
-*/
 
 export const initializeAssociatedUser = mutation({
   handler: async (ctx) => {
@@ -197,18 +186,3 @@ export const bindUserToCompany = internalMutation({
   },
 });
 
-/*
-To do
-1. Update the onboarding to have a field that asks if this is you? Give it it's own page, it's two buttons, with a warning that says this is not reversible. .
-If they click yes, then we call the bindusertocopmpany mutation. If they click no, then we continue with the onboarding.
-
-2. In the settings module add a div that has all the associated persons.
-			- We show all the persons. If they have an associated person then there is a red remove button.
-			- If there is an email but no associated then we say that it's pending and their's a tool tip explaining who must log in from where to claim the account
-			- If there is no email and associated user then there is an input field
-      - If you are the primary owner and your userId is not associated with anyone and the person has no email or associated user, then there is a button that says "this is me"
-
-
-3.
-
-*/

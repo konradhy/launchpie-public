@@ -38,17 +38,8 @@ export default defineSchema({
       filterFields: ["userId", "companyId"],
     }),
 
-  //i think this is being replaced completely by tasks
-  actionItems: defineTable({
-    recordId: v.id("records"),
-    userId: v.string(),
-    companyId: v.id("companies"),
-    task: v.string(),
-    personId: v.optional(v.id("persons")),
-  })
-    .index("by_recordId", ["recordId"])
-    .index("by_userId", ["userId"])
-    .index("by_companyId", ["companyId"]),
+
+
 
   users: defineTable({
     name: v.string(),

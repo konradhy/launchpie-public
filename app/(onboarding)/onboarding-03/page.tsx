@@ -5,7 +5,7 @@ import { ConvexError } from "convex/values";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
-import { InfoCircledIcon } from "@radix-ui/react-icons";
+
 import { Info } from "lucide-react";
 
 import { useSearchParams } from "next/navigation";

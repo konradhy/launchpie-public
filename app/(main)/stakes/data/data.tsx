@@ -30,21 +30,13 @@ export const statuses = [
     label: "Not Started",
     icon: QuestionMarkCircledIcon,
   },
-  {
-    value: "todo",
-    label: "Todo",
-    icon: CircleIcon,
-  },
+  
   {
     value: "inProgress",
     label: "In Progress",
     icon: StopwatchIcon,
   },
-  {
-    value: "done",
-    label: "Done",
-    icon: CheckCircledIcon,
-  },
+  
   {
     value: "completed",
     label: "Completed",

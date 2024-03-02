@@ -1,4 +1,4 @@
-//equity cards are ordered with yours first then the rest. The first equty card will have a 2xl shaddow. The others have a regular shadow
+
 "use client";
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

@@ -1,5 +1,5 @@
 "use client";
-import { Spinner } from "@/components/spinner";
+
 import { useConvexAuth } from "convex/react";
 import { redirect } from "next/navigation";
 import React from "react";
@@ -8,9 +8,9 @@ import { Navigation } from "./_components/navigation";
 import { SearchCommand } from "@/components/search-command";
 import { ModalProvider } from "@/components/providers/modal-provider";
 import { Skeleton } from "@/components/ui/skeleton";
-import { EquityCardSkeleton } from "./dashboard/_components/equity-card-area";
 
-//import { ModalProvider } from "@/components/providers/modal-provider";
+
+
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isLoading } = useConvexAuth();

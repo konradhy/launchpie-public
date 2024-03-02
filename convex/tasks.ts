@@ -287,7 +287,7 @@ export const completeTask = mutation({
         companyId: company._id,
       },
     });
-    console.log("Ran it and done the scheudler");
+
   },
 });
 

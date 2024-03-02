@@ -20,7 +20,7 @@ interface TaskCardProps {
   task: Doc<"tasks">;
 }
 
-// Priority color mapping
+
 const priorityColorMap = {
   high: "bg-pink-700",
   medium: "bg-amber-600",

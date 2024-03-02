@@ -1,11 +1,4 @@
-//to do:
-/*
-- Clicking the edit button trigers a useState. When true we render a similar form but with input fields instead of details
-- populate equity cards with real tasks
-- populate usertasks with real tasks
-- build the stakes page
 
-*/
 "use client";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";

@@ -26,7 +26,7 @@ export const NotesNav = ({ isCollapsed, onResetWidth }: NotesNavProps) => {
   });
 
   const onSave = async () => {
-    console.log("save");
+
     await chunkNoteText({
       id: params.noteId as Id<"notes">,
     });

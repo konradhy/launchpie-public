@@ -126,7 +126,7 @@ export const generateTaskObject = internalAction({
             companyId: args.companyId,
           },
         );
-        console.log(generatedTasks);
+
       }
 
       return completion.choices[0].message.content;
@@ -302,9 +302,9 @@ Please calculate an estimated time for each topic if not provided. Ensure the ag
       });
 
       const response = completion.choices[0].message.content;
-      //parse json object
 
-      console.log(response);
+
+
 
       if (!response) {
         throw new ConvexError(
@@ -324,7 +324,7 @@ Please calculate an estimated time for each topic if not provided. Ensure the ag
   },
 });
 
-//generate a summary, of the file
+
 
 export const generateFileSummary = internalAction({
   args: {

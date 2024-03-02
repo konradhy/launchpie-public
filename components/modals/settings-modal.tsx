@@ -5,9 +5,26 @@ import { useSettings } from "@/hooks/use-settings";
 import { Label } from "@/components/ui/label";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { appName } from "@/lib/utils";
+import { Bot } from "lucide-react";
+import { useAction,  } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { toast } from "sonner";
 
 export const SettingsModal = () => {
   const settings = useSettings();
+  const embedAll = useAction(api.ingest.embed.embedAllTemp);
+
+  const handleEmbed =async  () => {
+    try {
+      await embedAll();
+       toast.success("QuityAi updated");
+    } catch (error) {
+      toast.error("Failed to update QuityAi");
+    }
+ 
+   
+
+  }
 
   return (
     <Dialog open={settings.isOpen} onOpenChange={settings.onClose}>
@@ -23,7 +40,27 @@ export const SettingsModal = () => {
             </span>
           </div>
           <ThemeToggle />
+
+          
         </div>
+          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-y-1">
+            <Label>QuityAi</Label>
+            <span className="text-[0.8rem] text-muted-foreground">
+              Update Quity with the latest company info
+            </span>
+          </div>
+          <Bot
+          onClick = {handleEmbed}
+          className="cursor-pointer"
+          
+          />
+
+          
+        </div>
+        
+        
+
       </DialogContent>
     </Dialog>
   );

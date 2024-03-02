@@ -37,8 +37,6 @@ export const answer = internalAction({
       embeddingIds: searchResults.map(({ _id }) => _id),
     });
 
-    // grab the last shareholder value
-    //grab the company details
 
     const company = await ctx.runQuery(internal.companies.getByIdInternal, {
       id: companyId,

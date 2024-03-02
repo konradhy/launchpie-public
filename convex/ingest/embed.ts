@@ -2,6 +2,7 @@ import { ConvexError, v } from "convex/values";
 
 import { Id, TableNames } from "../_generated/dataModel";
 import {
+  action,
   internalAction,
   internalMutation,
   internalQuery,
@@ -23,7 +24,20 @@ export const embedAll = internalAction({
   },
 });
 
-//why aren't these mutations?
+
+//Can't stay like this, localize to imbedding only your own companyId
+export const embedAllTemp = action({
+  args: {
+  
+  },
+  handler: async (ctx) => {
+    const entities = ["tasks", "notes", "files"];
+    for (const entity of entities) {
+      await paginateAndEmbed(ctx, entity as TableNames);
+    }
+  },
+});
+
 export const embedList = internalAction({
   args: {
     fileIds: v.optional(v.array(v.id("files"))),
@@ -116,15 +130,14 @@ export const deleteEmbeddings = internalMutation({
     taskId: v.optional(v.id("tasks")),
   },
   handler: async (ctx, { fileId, noteId, taskId }) => {
-    console.log(fileId, noteId, taskId);
-    console.log("Deleting embeddings");
+
 
     try {
       if (fileId) await processDeletion(fileId, "byFileId", "fileId", ctx);
       if (noteId) await processDeletion(noteId, "byNoteId", "noteId", ctx);
       if (taskId) await processDeletion(taskId, "byTaskId", "taskId", ctx);
 
-      console.log("All items deleted successfully");
+
     } catch (error) {
       throw new ConvexError({
         message: "Failed to delete embeddings",

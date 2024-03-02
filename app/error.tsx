@@ -29,7 +29,7 @@ const Error = ({
       toast.error(
         "Error joining company. Please ensure that your project manager signed you up with the email you're using now",
       );
-      console.log(error);
+
     }
   };
   useEffect(() => {

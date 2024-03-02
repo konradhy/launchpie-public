@@ -57,8 +57,7 @@ export const saveStorageIds = mutation({
     //I need to iterate over the files, as it stands right now, the ChatBot will only be trained on the first file that you give it.
     const storageId = args.uploaded[0].storageId;
     const isDocx = args.uploaded[0].fileName.endsWith(".docx");
-    console.log("isDocx", isDocx);
-    console.log(args.uploaded[0].fileName);
+
 
     if (isDocx) {
       //manual hack was used here for typing fix properly later, see earlier note

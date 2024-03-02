@@ -35,11 +35,11 @@ export const extractTextFile = internalAction({
       args: args,
     });
 
-    //grab the first 1000 characters of the text
+
 
     const summary = text.substring(0, 1000);
 
-    // This will output the first 1000 characters of the original string.
+
 
     await ctx.runAction(internal.helpers.promptHelpers.generateFileSummary, {
       transcript: summary,
@@ -108,7 +108,7 @@ export const extractTextTask = internalAction({
   handler: async (ctx, { args }) => {
     const taskNarrative = generateTaskNarrative(args);
 
-    console.log("we re updating");
+
     await ctx.runMutation(internal.ingest.chunkers.taskChunker, {
       text: taskNarrative,
       args: args,

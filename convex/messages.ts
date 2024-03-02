@@ -22,9 +22,9 @@ export const send = mutation({
     sessionId: v.string(),
   },
   handler: async (ctx, { message, sessionId }) => {
-    console.log("send message");
+
     const identity = await ctx.auth.getUserIdentity();
-    console.log("identity", identity);
+
     const { company } = await validateUserAndCompanyMutations(ctx, "Messages");
 
     await ctx.db.insert("messages", {

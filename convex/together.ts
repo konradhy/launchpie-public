@@ -40,7 +40,7 @@ const RecordSchema = z.object({
       "A list of action items from the voice recording, short and to the point. Make sure all action item lists are fully resolved if they are nested",
     ),
 });
-
+//not used. Kept because it's more cost effective then current implementation. Consider switching back
 export const chat = internalAction({
   args: {
     id: v.id("records"),
@@ -67,7 +67,7 @@ export const chat = internalAction({
       });
       const { title, summary, actionItems } = extract;
 
-      console.log("this is what was extracted:", title, summary, actionItems);
+
 
       await ctx.runMutation(internal.together.saveSummary, {
         id: args.id,
@@ -119,14 +119,7 @@ export const saveSummary = internalMutation({
       console.error(`Couldn't find record ${id}`);
       return;
     }
-    for (let actionItem of actionItems) {
-      await ctx.db.insert("actionItems", {
-        task: actionItem,
-        recordId: id,
-        userId: record.userId,
-        companyId: record.companyId,
-      });
-    }
+
 
     await ctx.db.patch(id, {
       generatingActionItems: false,
@@ -153,14 +146,14 @@ export const similarRecords = action({
     });
     const embedding = getEmbedding.data[0].embedding;
 
-    // 2. Then search for similar notes
+ 
     const results = await ctx.vectorSearch("records", "by_embedding", {
       vector: embedding,
       limit: 16,
-      filter: (q) => q.eq("userId", identity.tokenIdentifier), // Only search my notes.
+      filter: (q) => q.eq("userId", identity.tokenIdentifier), 
     });
 
-    console.log({ results });
+
 
     return results.map((r) => ({
       id: r._id,

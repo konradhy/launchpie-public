@@ -101,7 +101,7 @@ export const taskChunker = internalMutation({
     const hasChanged = latestVersion === null || latestVersion.text !== text;
     if (hasChanged) {
       await ctx.db.patch(args.id, { text });
-      console.log(text);
+    
 
       const splitter = new CharacterTextSplitter({
         chunkSize: 1536,

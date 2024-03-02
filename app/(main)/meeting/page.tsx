@@ -70,7 +70,7 @@ const RecordVoicePage = () => {
         storageId,
       });
 
-      router.push(`/meeting/${recordId}`);
+      router.push(`/stakes`);
     };
     setMediaRecorder(recorder as any);
     recorder.start();
@@ -140,6 +140,7 @@ const RecordVoicePage = () => {
             </div>
           </div>
 
+{!isRunning ? (
           <Button
             size={"lg"}
             variant={"expandIcon"}
@@ -150,6 +151,19 @@ const RecordVoicePage = () => {
           >
             <span className="text-[40px]">Start Recording</span>
           </Button>
+        ) : (
+          <Button
+            size={"lg"}
+            variant={"expandIcon"}
+            Icon={() => <MicOff size={40} />}
+            iconPlacement={"right"}
+            className="p-10 rounded-2xl mt-8"
+            onClick={handleRecordClick}
+          >
+            <span className="text-[40px]">Stop Recording</span>
+          </Button>
+        )
+}
         </CardContent>
       </Card>
 

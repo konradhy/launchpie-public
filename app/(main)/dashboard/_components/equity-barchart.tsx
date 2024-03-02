@@ -22,8 +22,8 @@ export const EquityBarchart = () => {
   }
   const currencyFormatter = new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "USD", // Change to your preferred currency
-    minimumFractionDigits: 0, // Optional: Adjust according to your needs
+    currency: "USD", 
+    minimumFractionDigits: 0, 
   });
 
   return (
@@ -81,7 +81,7 @@ export const EquityBarchart = () => {
             },
             legends: {
               text: {
-                fill: "#d66b6b", // Light text for legends
+                fill: "#d66b6b", 
               },
             },
             tooltip: {

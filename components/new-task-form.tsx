@@ -42,7 +42,6 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "./ui/textarea";
 import { ScrollArea } from "./ui/scroll-area";
 
-//import { DatePicker } from "@/components/ui/datepicker"; // Assuming you have a DatePicker component
 
 interface NewTaskFormProps {
   companyId: Id<"companies">;

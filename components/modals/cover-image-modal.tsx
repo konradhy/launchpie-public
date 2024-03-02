@@ -6,7 +6,6 @@ import { useParams } from "next/navigation";
 
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { useCoverImage } from "@/hooks/use-cover-image";
-// import { SingleImageDropzone } from "@/components/single-image-dropzone";
 
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
@@ -44,26 +43,7 @@ export const CoverImageModal = () => {
     }
   };
 
-  // const onChange = async (file?: File) => {
-  //   if (file) {
-  //     setIsSubmitting(true);
-  //     setFile(file);
-  
 
-  //     const res = await edgestore.publicFiles.upload({
-  //       file,
-  //       options: {
-  //         replaceTargetUrl: coverImage.url,
-  //       },
-  //     });
-  //     await update({
-  //       id: params.notesId as Id<"notes">,
-  //       coverImage: res.url,
-  //     });
-
-  //     onClose();
-  //   }
-  // };
 
   return (
     <Dialog open={coverImage.isOpen} onOpenChange={coverImage.onClose}>
@@ -79,7 +59,7 @@ export const CoverImageModal = () => {
       }}
       onUploadComplete={saveAfterUpload}
       onUploadError={(error: unknown) => {
-        // Do something with the error.
+ 
         alert(`ERROR! ${error}`);
       }}
     />
