@@ -4,13 +4,22 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Doc } from "@/convex/_generated/dataModel";
+import { Doc, Id } from "@/convex/_generated/dataModel";
+import { useEditTask } from "@/hooks/use-edit-task";
 
-const TaskCard = ({ task, detail }: { task: string; detail: string }) => {
+const TaskCard = ({ task }: { task: Doc<"tasks"> }) => {
+  const editTask = useEditTask();
   return (
-    <div className="max-w-[25rem] bg-primary/10 p-2 rounded-lg mb-2 last:mb-0 shadow-inner hover:bg-primary/20 dark:hover:bg-gray-700 cursor-pointer dark:bg-gray-800">
-      <p className="text-sm font-semibold truncate">{task}</p>
-      <p className="text-xs text-gray-500 truncate">{detail}</p>
+    <div
+      onClick={() => editTask.onOpen(task)}
+      className="max-w-[25rem] bg-primary/10 p-2 rounded-lg mb-2 last:mb-0 shadow-inner hover:bg-primary/20 dark:hover:bg-gray-700 cursor-pointer dark:bg-gray-800"
+    >
+      <p className="text-sm font-semibold truncate">
+        {task.title || "loading..."}
+      </p>
+      <p className="text-xs text-gray-500 truncate">
+        {task.description || "loading..."}
+      </p>
     </div>
   );
 };
@@ -49,11 +58,7 @@ const EquityCard = ({
       <ScrollArea className="h-20">
         <CardContent className="p-3">
           {tasks.map((task, index) => (
-            <TaskCard
-              key={index}
-              task={task.title || "loading"}
-              detail={task.description}
-            />
+            <TaskCard key={index} task={task} />
           ))}
         </CardContent>
       </ScrollArea>

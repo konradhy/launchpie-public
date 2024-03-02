@@ -40,6 +40,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "./ui/textarea";
 import { useEditTask } from "@/hooks/use-edit-task";
+import { ScrollArea } from "./ui/scroll-area";
 
 //import { DatePicker } from "@/components/ui/datepicker"; // Assuming you have a DatePicker component
 
@@ -135,24 +136,25 @@ export const EditTaskForm = ({ task }: EditTaskFormProps) => {
     await onSubmit(debugData);
   };
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Input placeholder="Task Description" {...field} />
-              </FormControl>
-              <FormDescription>Describe the task in detail.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+    <ScrollArea className=" h-[30rem] ">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 m-2">
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Input placeholder="Task Description" {...field} />
+                </FormControl>
+                <FormDescription>Describe the task in detail.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        {/* <FormField
+          {/* <FormField
           control={form.control}
           name="assignees"
           render={() => (
@@ -209,413 +211,420 @@ export const EditTaskForm = ({ task }: EditTaskFormProps) => {
             </FormItem>
           )}
         /> */}
-        <FormField
-          control={form.control}
-          name="estimatedTime"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Estimated Time (hours)</FormLabel>
-              <FormControl>
-                <Input type="number" {...field} />
-              </FormControl>
-              <FormDescription>
-                How many hours are expected to complete this task?
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="estimatedTime"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Estimated Time (hours)</FormLabel>
+                <FormControl>
+                  <Input type="number" {...field} />
+                </FormControl>
+                <FormDescription>
+                  How many hours are expected to complete this task?
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="dueDate"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Due Date</FormLabel>
-              <FormControl>
-                {/* <DatePicker {...field} /> */}
-                <Input type="date" {...field} />
-              </FormControl>
-              <FormDescription>When is the task due?</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="dueDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Due Date</FormLabel>
+                <FormControl>
+                  {/* <DatePicker {...field} /> */}
+                  <Input type="date" {...field} />
+                </FormControl>
+                <FormDescription>When is the task due?</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-          <CollapsibleTrigger asChild>
-            <div className="flex items-center justify-center hover:cursor-pointer t">
-              <span className="text-gray-500 mr-2 ">Advanced</span>
-              <CaretSortIcon className="h-4 w-4 text-gray-600" />
-            </div>
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            {/* taskState*/}
+          <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+            <CollapsibleTrigger asChild>
+              <div className="flex items-center justify-center hover:cursor-pointer t">
+                <span className="text-gray-500 mr-2 ">Advanced</span>
+                <CaretSortIcon className="h-4 w-4 text-gray-600" />
+              </div>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              {/* taskState*/}
 
-            <div className=" mb-4">
+              <div className=" mb-4">
+                <FormField
+                  control={form.control}
+                  name="notes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Notes</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Share additional notes and comments about the task here"
+                          className="resize-none justify-between rounded-lg border  shadow-sm"
+                          {...field}
+                        />
+                      </FormControl>
+
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4 justify-between rounded-lg border p-3 shadow-sm mb-4">
+                <FormField
+                  control={form.control}
+                  name="taskState"
+                  render={({ field }) => (
+                    <FormItem>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger className="m-3 ">
+                          <Button variant="ghost">
+                            <span className="text-md">
+                              {(() => {
+                                switch (field.value) {
+                                  case "completed":
+                                    return "Completed";
+                                  case "inProgress":
+                                    return "In Progress";
+                                  case "notStarted":
+                                    return "Not Started";
+                                  default:
+                                    return field.value;
+                                }
+                              })()}
+                            </span>
+                            <CaretSortIcon className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent className="w-56" side="right">
+                          <DropdownMenuLabel>
+                            Current Progress
+                          </DropdownMenuLabel>
+                          <DropdownMenuSeparator className="border-t border-indigo-400 " />
+                          <FormControl>
+                            <DropdownMenuRadioGroup
+                              {...field}
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                              className="flex flex-col space-y-1"
+                            >
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <DropdownMenuRadioItem value="notStarted">
+                                    {" "}
+                                    Not Started{" "}
+                                  </DropdownMenuRadioItem>
+                                </FormControl>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <DropdownMenuRadioItem value="inProgress">
+                                    {" "}
+                                    In Progress{" "}
+                                  </DropdownMenuRadioItem>
+                                </FormControl>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <DropdownMenuRadioItem value="completed">
+                                    {" "}
+                                    Completed{" "}
+                                  </DropdownMenuRadioItem>
+                                </FormControl>
+                              </FormItem>
+                            </DropdownMenuRadioGroup>
+                          </FormControl>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="reviewStatus"
+                  render={({ field }) => (
+                    <FormItem>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger className="m-3 ">
+                          <Button variant="ghost">
+                            <span className="text-md">
+                              {(() => {
+                                switch (field.value) {
+                                  case "notFlagged":
+                                    return "Not Flagged";
+                                  case "approved":
+                                    return "Approved";
+                                  case "flagged":
+                                    return "Flagged";
+                                  default:
+                                    return field.value;
+                                }
+                              })()}
+                            </span>
+                            <CaretSortIcon className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent className="w-56" side="right">
+                          <DropdownMenuLabel>
+                            Current Progress
+                          </DropdownMenuLabel>
+                          <DropdownMenuSeparator className="border-t border-indigo-400 " />
+                          <FormControl>
+                            <DropdownMenuRadioGroup
+                              {...field}
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                              className="flex flex-col space-y-1"
+                            >
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <DropdownMenuRadioItem value="notFlagged">
+                                    {" "}
+                                    Not Flagged{" "}
+                                  </DropdownMenuRadioItem>
+                                </FormControl>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <DropdownMenuRadioItem value="flagged">
+                                    {" "}
+                                    Flag{" "}
+                                  </DropdownMenuRadioItem>
+                                </FormControl>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <DropdownMenuRadioItem value="approved">
+                                    {" "}
+                                    Approve{" "}
+                                  </DropdownMenuRadioItem>
+                                </FormControl>
+                              </FormItem>
+                            </DropdownMenuRadioGroup>
+                          </FormControl>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4 justify-between rounded-lg border p-3 shadow-sm mb-4">
+                <FormField
+                  control={form.control}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger className="m-3 ">
+                          <Button variant="ghost">
+                            <span className="text-md">
+                              {(() => {
+                                switch (field.value) {
+                                  case "marketing":
+                                    return "Marketing";
+                                  case "finance":
+                                    return "Finance";
+                                  case "operations":
+                                    return "Operations";
+                                  case "development":
+                                    return "Development";
+                                  case "strategy":
+                                    return "Strategy";
+                                  case "legal":
+                                    return "Legal";
+                                  case "Uncategorized":
+                                    return "Uncategorized";
+
+                                  default:
+                                    return "Uncategorized";
+                                }
+                              })()}
+                            </span>
+                            <CaretSortIcon className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent className="w-56" side="right">
+                          <DropdownMenuLabel>
+                            Current Progress
+                          </DropdownMenuLabel>
+                          <DropdownMenuSeparator className="border-t border-indigo-400 " />
+                          <FormControl>
+                            <DropdownMenuRadioGroup
+                              {...field}
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                              className="flex flex-col space-y-1"
+                            >
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <DropdownMenuRadioItem value="marketing">
+                                    {" "}
+                                    Marketing{" "}
+                                  </DropdownMenuRadioItem>
+                                </FormControl>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <DropdownMenuRadioItem value="finance">
+                                    {" "}
+                                    Finance{" "}
+                                  </DropdownMenuRadioItem>
+                                </FormControl>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <DropdownMenuRadioItem value="operations">
+                                    {" "}
+                                    Operations{" "}
+                                  </DropdownMenuRadioItem>
+                                </FormControl>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <DropdownMenuRadioItem value="development">
+                                    {" "}
+                                    Development{" "}
+                                  </DropdownMenuRadioItem>
+                                </FormControl>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <DropdownMenuRadioItem value="strategy">
+                                    {" "}
+                                    Strategy{" "}
+                                  </DropdownMenuRadioItem>
+                                </FormControl>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <DropdownMenuRadioItem value="legal">
+                                    {" "}
+                                    Legal{" "}
+                                  </DropdownMenuRadioItem>
+                                </FormControl>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <DropdownMenuRadioItem value="Uncategorized">
+                                    {" "}
+                                    Uncategorized{" "}
+                                  </DropdownMenuRadioItem>
+                                </FormControl>
+                              </FormItem>
+                            </DropdownMenuRadioGroup>
+                          </FormControl>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="priority"
+                  render={({ field }) => (
+                    <FormItem>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger className="m-3 ">
+                          <Button variant="ghost">
+                            <span className="text-md">
+                              {(() => {
+                                switch (field.value) {
+                                  case "low":
+                                    return "Low";
+                                  case "medium":
+                                    return "Medium";
+                                  case "high":
+                                    return "High";
+
+                                  default:
+                                    return field.value;
+                                }
+                              })()}
+                            </span>
+                            <CaretSortIcon className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent className="w-56" side="right">
+                          <DropdownMenuLabel>Priority</DropdownMenuLabel>
+                          <DropdownMenuSeparator className="border-t border-indigo-400 " />
+                          <FormControl>
+                            <DropdownMenuRadioGroup
+                              {...field}
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                              className="flex flex-col space-y-1"
+                            >
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <DropdownMenuRadioItem value="low">
+                                    {" "}
+                                    Low{" "}
+                                  </DropdownMenuRadioItem>
+                                </FormControl>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <DropdownMenuRadioItem value="medium">
+                                    {" "}
+                                    Medium{" "}
+                                  </DropdownMenuRadioItem>
+                                </FormControl>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <DropdownMenuRadioItem value="high">
+                                    {" "}
+                                    High{" "}
+                                  </DropdownMenuRadioItem>
+                                </FormControl>
+                              </FormItem>
+                            </DropdownMenuRadioGroup>
+                          </FormControl>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </FormItem>
+                  )}
+                />
+              </div>
+
               <FormField
                 control={form.control}
-                name="notes"
+                name="meetingAgendaFlag"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Notes</FormLabel>
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                    <div className="space-y-0.5">
+                      <FormLabel>Include in Meeting Agenda</FormLabel>
+                      <FormDescription>
+                        Include as an agenda item for the next shareholder
+                        meeting.
+                      </FormDescription>
+                    </div>
                     <FormControl>
-                      <Textarea
-                        placeholder="Share additional notes and comments about the task here"
-                        className="resize-none justify-between rounded-lg border  shadow-sm"
-                        {...field}
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
                       />
                     </FormControl>
-
-                    <FormMessage />
                   </FormItem>
                 )}
               />
-            </div>
-            <div className="grid grid-cols-2 gap-4 justify-between rounded-lg border p-3 shadow-sm mb-4">
-              <FormField
-                control={form.control}
-                name="taskState"
-                render={({ field }) => (
-                  <FormItem>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger className="m-3 ">
-                        <Button variant="ghost">
-                          <span className="text-md">
-                            {(() => {
-                              switch (field.value) {
-                                case "completed":
-                                  return "Completed";
-                                case "inProgress":
-                                  return "In Progress";
-                                case "notStarted":
-                                  return "Not Started";
-                                default:
-                                  return field.value;
-                              }
-                            })()}
-                          </span>
-                          <CaretSortIcon className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
+            </CollapsibleContent>
+          </Collapsible>
 
-                      <DropdownMenuContent className="w-56" side="right">
-                        <DropdownMenuLabel>Current Progress</DropdownMenuLabel>
-                        <DropdownMenuSeparator className="border-t border-indigo-400 " />
-                        <FormControl>
-                          <DropdownMenuRadioGroup
-                            {...field}
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                            className="flex flex-col space-y-1"
-                          >
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <DropdownMenuRadioItem value="notStarted">
-                                  {" "}
-                                  Not Started{" "}
-                                </DropdownMenuRadioItem>
-                              </FormControl>
-                            </FormItem>
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <DropdownMenuRadioItem value="inProgress">
-                                  {" "}
-                                  In Progress{" "}
-                                </DropdownMenuRadioItem>
-                              </FormControl>
-                            </FormItem>
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <DropdownMenuRadioItem value="completed">
-                                  {" "}
-                                  Completed{" "}
-                                </DropdownMenuRadioItem>
-                              </FormControl>
-                            </FormItem>
-                          </DropdownMenuRadioGroup>
-                        </FormControl>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="reviewStatus"
-                render={({ field }) => (
-                  <FormItem>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger className="m-3 ">
-                        <Button variant="ghost">
-                          <span className="text-md">
-                            {(() => {
-                              switch (field.value) {
-                                case "notFlagged":
-                                  return "Not Flagged";
-                                case "approved":
-                                  return "Approved";
-                                case "flagged":
-                                  return "Flagged";
-                                default:
-                                  return field.value;
-                              }
-                            })()}
-                          </span>
-                          <CaretSortIcon className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-
-                      <DropdownMenuContent className="w-56" side="right">
-                        <DropdownMenuLabel>Current Progress</DropdownMenuLabel>
-                        <DropdownMenuSeparator className="border-t border-indigo-400 " />
-                        <FormControl>
-                          <DropdownMenuRadioGroup
-                            {...field}
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                            className="flex flex-col space-y-1"
-                          >
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <DropdownMenuRadioItem value="notFlagged">
-                                  {" "}
-                                  Not Flagged{" "}
-                                </DropdownMenuRadioItem>
-                              </FormControl>
-                            </FormItem>
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <DropdownMenuRadioItem value="flagged">
-                                  {" "}
-                                  Flag{" "}
-                                </DropdownMenuRadioItem>
-                              </FormControl>
-                            </FormItem>
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <DropdownMenuRadioItem value="approved">
-                                  {" "}
-                                  Approve{" "}
-                                </DropdownMenuRadioItem>
-                              </FormControl>
-                            </FormItem>
-                          </DropdownMenuRadioGroup>
-                        </FormControl>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </FormItem>
-                )}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4 justify-between rounded-lg border p-3 shadow-sm mb-4">
-              <FormField
-                control={form.control}
-                name="category"
-                render={({ field }) => (
-                  <FormItem>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger className="m-3 ">
-                        <Button variant="ghost">
-                          <span className="text-md">
-                            {(() => {
-                              switch (field.value) {
-                                case "marketing":
-                                  return "Marketing";
-                                case "finance":
-                                  return "Finance";
-                                case "operations":
-                                  return "Operations";
-                                case "development":
-                                  return "Development";
-                                case "strategy":
-                                  return "Strategy";
-                                case "legal":
-                                  return "Legal";
-                                case "Uncategorized":
-                                  return "Uncategorized";
-
-                                default:
-                                  return "Uncategorized";
-                              }
-                            })()}
-                          </span>
-                          <CaretSortIcon className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-
-                      <DropdownMenuContent className="w-56" side="right">
-                        <DropdownMenuLabel>Current Progress</DropdownMenuLabel>
-                        <DropdownMenuSeparator className="border-t border-indigo-400 " />
-                        <FormControl>
-                          <DropdownMenuRadioGroup
-                            {...field}
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                            className="flex flex-col space-y-1"
-                          >
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <DropdownMenuRadioItem value="marketing">
-                                  {" "}
-                                  Marketing{" "}
-                                </DropdownMenuRadioItem>
-                              </FormControl>
-                            </FormItem>
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <DropdownMenuRadioItem value="finance">
-                                  {" "}
-                                  Finance{" "}
-                                </DropdownMenuRadioItem>
-                              </FormControl>
-                            </FormItem>
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <DropdownMenuRadioItem value="operations">
-                                  {" "}
-                                  Operations{" "}
-                                </DropdownMenuRadioItem>
-                              </FormControl>
-                            </FormItem>
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <DropdownMenuRadioItem value="development">
-                                  {" "}
-                                  Development{" "}
-                                </DropdownMenuRadioItem>
-                              </FormControl>
-                            </FormItem>
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <DropdownMenuRadioItem value="strategy">
-                                  {" "}
-                                  Strategy{" "}
-                                </DropdownMenuRadioItem>
-                              </FormControl>
-                            </FormItem>
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <DropdownMenuRadioItem value="legal">
-                                  {" "}
-                                  Legal{" "}
-                                </DropdownMenuRadioItem>
-                              </FormControl>
-                            </FormItem>
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <DropdownMenuRadioItem value="Uncategorized">
-                                  {" "}
-                                  Uncategorized{" "}
-                                </DropdownMenuRadioItem>
-                              </FormControl>
-                            </FormItem>
-                          </DropdownMenuRadioGroup>
-                        </FormControl>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="priority"
-                render={({ field }) => (
-                  <FormItem>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger className="m-3 ">
-                        <Button variant="ghost">
-                          <span className="text-md">
-                            {(() => {
-                              switch (field.value) {
-                                case "low":
-                                  return "Low";
-                                case "medium":
-                                  return "Medium";
-                                case "high":
-                                  return "High";
-
-                                default:
-                                  return field.value;
-                              }
-                            })()}
-                          </span>
-                          <CaretSortIcon className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-
-                      <DropdownMenuContent className="w-56" side="right">
-                        <DropdownMenuLabel>Priority</DropdownMenuLabel>
-                        <DropdownMenuSeparator className="border-t border-indigo-400 " />
-                        <FormControl>
-                          <DropdownMenuRadioGroup
-                            {...field}
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                            className="flex flex-col space-y-1"
-                          >
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <DropdownMenuRadioItem value="low">
-                                  {" "}
-                                  Low{" "}
-                                </DropdownMenuRadioItem>
-                              </FormControl>
-                            </FormItem>
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <DropdownMenuRadioItem value="medium">
-                                  {" "}
-                                  Medium{" "}
-                                </DropdownMenuRadioItem>
-                              </FormControl>
-                            </FormItem>
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <DropdownMenuRadioItem value="high">
-                                  {" "}
-                                  High{" "}
-                                </DropdownMenuRadioItem>
-                              </FormControl>
-                            </FormItem>
-                          </DropdownMenuRadioGroup>
-                        </FormControl>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={form.control}
-              name="meetingAgendaFlag"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                  <div className="space-y-0.5">
-                    <FormLabel>Include in Meeting Agenda</FormLabel>
-                    <FormDescription>
-                      Include as an agenda item for the next shareholder
-                      meeting.
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-          </CollapsibleContent>
-        </Collapsible>
-
-        <Button onClick={onDebugSubmit}>Edit Task</Button>
-        {/* <Button type="submit">Edit Task</Button> */}
-      </form>
-    </Form>
+          <Button onClick={onDebugSubmit}>Edit Task</Button>
+          {/* <Button type="submit">Edit Task</Button> */}
+        </form>
+      </Form>
+    </ScrollArea>
   );
 };

@@ -35,9 +35,6 @@ export const metadata: Metadata = {
 };
 
 export default function DashboardPage() {
-  //i think i just pass the shareholderid here. Then i do everything else in the equity card
-  //create a new component called equity card holder. This will be a use client that holds the equity card map
-
   return (
     <>
       <div className=" flex-col md:flex   ">
@@ -48,9 +45,6 @@ export default function DashboardPage() {
             <div className="flex items-center space-x-2">
               <div className="ml-auto flex items-center space-x-4">
                 <Search />
-                {/*add search command. For everything, files, notes and task.
-                A click triggers the modal. With the first input being in the search bar
-                 */}
               </div>
               <NewStake />
             </div>

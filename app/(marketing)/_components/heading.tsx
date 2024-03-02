@@ -10,7 +10,6 @@ import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
 export const Heading = () => {
-  const initAssociatedUser = useMutation(api.users.initializeAssociatedUser); // deserves it's own page, that you go to when users join existing companiesx
   const { isAuthenticated, isLoading } = useConvexAuth();
   return (
     <div className="max-w-3xl space-y-4 dark:text-amber-50">

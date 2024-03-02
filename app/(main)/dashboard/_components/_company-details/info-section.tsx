@@ -115,7 +115,7 @@ export const InfoSection = ({
               </div>
             ))}
           </TooltipProvider>
-          <Button onClick={handleClick}>Bind new users</Button>
+          <Button onClick={handleClick}>Bind your email</Button>
           <Separator />
           <SheetFooter className="flex justify-end mt-4">
             <SheetClose asChild>

@@ -19,21 +19,9 @@ import { useRouter } from "next/navigation";
 export const Navbar = () => {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const scrolled = useScrollTop();
-  const initAssociatedUser = useMutation(api.users.initializeAssociatedUser);
+
   const router = useRouter();
 
-  const handleJoinCompany = async () => {
-    try {
-      await initAssociatedUser({});
-      toast.success("You've successfully joined the company");
-      router.push("/dashboard");
-    } catch (error) {
-      toast.error(
-        "Error joining company. Please ensure that your project manager signed you up with the email you're using now",
-      );
-      console.log(error);
-    }
-  };
   return (
     <div
       className={cn(
@@ -63,13 +51,6 @@ export const Navbar = () => {
               <Button size="sm">Create New {appName} </Button>
             </Link>
 
-            <Button
-              onClick={handleJoinCompany}
-              className="bg-secondary text-white"
-              size="sm"
-            >
-              Join existing company
-            </Button>
             <UserButton afterSignOutUrl="/" />
           </>
         )}

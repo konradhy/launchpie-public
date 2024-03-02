@@ -11,7 +11,8 @@ import {
 import { AvatarImage, AvatarFallback, Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Spinner } from "@/components/spinner";
+import { useEditTask } from "@/hooks/use-edit-task";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { Doc } from "@/convex/_generated/dataModel";
 
@@ -26,30 +27,36 @@ const priorityColorMap = {
   low: "bg-lime-500",
 };
 
-const TaskCard = ({ task }: TaskCardProps) => (
-  <div className="p-4 bg-primary/5 rounded-lg shadow-md flex items-center justify-between cursor-pointer hover:bg-primary/10 dark:hover:bg-gray-700  dark:bg-slate-800">
-    <div className="flex flex-row">
-      <Avatar>
-        <AvatarImage src="/placeholder-avatar.png" />
-        <AvatarFallback>U</AvatarFallback>
-      </Avatar>
-
-      <div className="ml-4">
-        {" "}
-        <h3 className="text-lg font-semibold truncate ">{task.title}</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-          {task.dueDate}
-        </p>
-      </div>
-    </div>
-
-    <Badge
-      className={`rounded-full text-xs font-semibold text-slate-50 ${priorityColorMap[task.priority]}`}
+const TaskCard = ({ task }: TaskCardProps) => {
+  const editTask = useEditTask();
+  return (
+    <div
+      onClick={() => editTask.onOpen(task)}
+      className="p-4 bg-primary/5 rounded-lg shadow-md flex items-center justify-between cursor-pointer hover:bg-primary/10 dark:hover:bg-gray-700  dark:bg-slate-800"
     >
-      {task.priority}
-    </Badge>
-  </div>
-);
+      <div className="flex flex-row">
+        <Avatar>
+          <AvatarImage src="/placeholder-avatar.png" />
+          <AvatarFallback>U</AvatarFallback>
+        </Avatar>
+
+        <div className="ml-4">
+          {" "}
+          <h3 className="text-lg font-semibold truncate ">{task.title}</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            {task.dueDate}
+          </p>
+        </div>
+      </div>
+
+      <Badge
+        className={`rounded-full text-xs font-semibold text-slate-50 ${priorityColorMap[task.priority]}`}
+      >
+        {task.priority}
+      </Badge>
+    </div>
+  );
+};
 
 export default function Component() {
   const tasks = useQuery(api.dashboard.currentStakes.getCurrentStakes);
