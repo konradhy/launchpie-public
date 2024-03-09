@@ -8,8 +8,8 @@ import { Toaster } from "sonner";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Launchpad",
-  description: `Launchpad isn't just a tool; it's a promise for a fairer startup future. Inspired by top industry minds, our platform transforms equity distribution into a journey of harmony and shared success. Say goodbye to disputes and hello to a fair future.`,
+  title: "Launchpie",
+  description: `Launchpie isn't just a tool; it's a promise for a fairer startup future. Inspired by top industry minds, our platform transforms equity distribution into a journey of harmony and shared success. Say goodbye to disputes and hello to a fair future.`,
    icons: {
     icon: [
       {
@@ -41,7 +41,7 @@ export default function RootLayout({
               defaultTheme="system"
               enableSystem
               disableTransitionOnChange
-              storageKey="launchpad-theme"
+              storageKey="launchpie-theme"
             >
                  <Toaster position="bottom-center" />
                  {children}

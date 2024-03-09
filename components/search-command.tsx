@@ -93,56 +93,52 @@ export const SearchCommand = () => {
   }
   return (
     <TooltipProvider>
-      <Tooltip>
-        <CommandDialog open={isOpen} onOpenChange={onClose}>
-          <CommandInput
-            placeholder={`Search ${user?.fullName}'s workspace...`}
-          />
-          <CommandList>
-            <CommandEmpty>No results found</CommandEmpty>
-            <CommandGroup heading="Uploaded Files">
-              {files?.map((file, index) => (
-                <CommandItem
-                  key={file._id}
-                  value={`${file._id}-${file.fileName}`}
-                  title={file.fileName}
-                  className="flex justify-between"
+      <CommandDialog open={isOpen} onOpenChange={onClose}>
+        <CommandInput placeholder={`Search ${user?.fullName}'s workspace...`} />
+        <CommandList>
+          <CommandEmpty>No results found</CommandEmpty>
+          <CommandGroup heading="Uploaded Files">
+            {files?.map((file, index) => (
+              <CommandItem
+                key={file._id}
+                value={`${file._id}-${file.fileName}`}
+                title={file.fileName}
+                className="flex justify-between"
+              >
+                <span
+                  onClick={() => onSelectFile(file._id)}
+                  className="truncate"
                 >
-                  <span
-                    onClick={() => onSelectFile(file._id)}
-                    className="truncate"
-                  >
-                    <TooltipTrigger id={file._id + index}>
-                      {file.fileName}
-                    </TooltipTrigger>
+                  <Tooltip>
+                    <TooltipTrigger>{file.fileName}</TooltipTrigger>
                     <TooltipContent className="max-w-md break-words whitespace-normal">
                       {file.summary}
                     </TooltipContent>
-                  </span>
-                  <div>
-                    <Trash
-                      onClick={() => onDeleteFile(file._id)}
-                      className=" h-2 w-2 hover:text-red-500"
-                    />
-                  </div>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-            <CommandGroup heading="Notes">
-              {notes?.map((note) => (
-                <CommandItem key={note._id} value={note._id} title={note.title}>
-                  <span
-                    onClick={() => onSelectNote(note._id)}
-                    className="truncate"
-                  >
-                    {note.title}
-                  </span>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </CommandDialog>
-      </Tooltip>
+                  </Tooltip>
+                </span>
+                <div>
+                  <Trash
+                    onClick={() => onDeleteFile(file._id)}
+                    className=" h-2 w-2 hover:text-red-500"
+                  />
+                </div>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+          <CommandGroup heading="Notes">
+            {notes?.map((note) => (
+              <CommandItem key={note._id} value={note._id} title={note.title}>
+                <span
+                  onClick={() => onSelectNote(note._id)}
+                  className="truncate"
+                >
+                  {note.title}
+                </span>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </CommandList>
+      </CommandDialog>
     </TooltipProvider>
   );
 };

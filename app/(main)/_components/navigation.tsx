@@ -33,9 +33,8 @@ import { Nav } from "./nav";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useSettings } from "@/hooks/use-settings";
 import { ConvexAiChat } from "@/app/aiChat";
-import { Button } from "@/components/ui/button";
 import { NotesNav } from "./notes/notes-nav";
-import path from "path";
+
 interface NavLink {
   title: string;
   label?: string;
@@ -56,7 +55,7 @@ export const Navigation = () => {
   const fileUpload = useFileUpload();
   const newTask = useNewTask();
   const search = useSearch();
-  const router = useRouter();
+
   const settings = useSettings();
   useStoreUserEffect();
 

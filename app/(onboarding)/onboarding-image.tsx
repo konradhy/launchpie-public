@@ -1,6 +1,6 @@
 import Image from "next/image";
-import OnboardingBg from "@/public/images/onboarding-image1.jpeg";
-import OnboardingDecoration from "@/public/images/auth-decoration.png";
+//import OnboardingBg from "/images/onboarding-image1.jpeg";
+//import OnboardingDecoration from "/images/auth-decoration.png";
 
 export default function OnboardingImage() {
   return (
@@ -10,7 +10,7 @@ export default function OnboardingImage() {
     >
       <Image
         className="object-cover object-center w-full h-full"
-        src={OnboardingBg}
+        src={"/images/onboarding-image1.jpeg"}
         priority
         width={760}
         height={1024}
@@ -18,7 +18,7 @@ export default function OnboardingImage() {
       />
       <Image
         className="absolute top-1/4 left-0 -translate-x-1/2 ml-8 hidden lg:block"
-        src={OnboardingDecoration}
+        src={"/images/auth-decoration.png"}
         priority
         width={218}
         height="224"
