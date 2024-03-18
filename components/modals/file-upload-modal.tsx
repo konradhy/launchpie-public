@@ -38,10 +38,12 @@ export const FileUploadModal = () => {
         fileUpload.onClose();
       }
 
-      toast.warning(
-        "File uploaded. However Quity is only able to read docx files! Quity won't be able to read this file.",
-      );
-      fileUpload.onClose();
+      if (!isDocx) {
+        toast.warning(
+          "File uploaded. However Quity is only able to read docx files! Quity won't be able to read this file.",
+        );
+        fileUpload.onClose();
+      }
     } catch (e) {
       toast.error("Error uploading file");
     }
@@ -133,4 +135,3 @@ function HelpCircleIcon(props: any) {
     </svg>
   );
 }
-

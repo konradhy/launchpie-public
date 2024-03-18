@@ -49,7 +49,7 @@ export const getMeetingAgendaTasks = internalQuery({
       .withIndex("by_company", (q) => q.eq("companyId", companyId))
       .filter((q) => q.eq(q.field("meetingAgendaFlag"), true))
       .filter((q) => q.neq(q.field("taskState"), "completed"))
-      .collect();
+      .take(100);
 
     return meetingTasks;
   },

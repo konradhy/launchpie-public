@@ -127,7 +127,7 @@ export const SearchCommand = () => {
           </CommandGroup>
           <CommandGroup heading="Notes">
             {notes?.map((note) => (
-              <CommandItem key={note._id} value={note._id} title={note.title}>
+              <CommandItem key={note._id} value={note.title} title={note.title}>
                 <span
                   onClick={() => onSelectNote(note._id)}
                   className="truncate"

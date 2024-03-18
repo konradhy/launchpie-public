@@ -35,15 +35,7 @@ const formSchema = z.object({
     .string()
     .min(2, { message: "Company name is too short" })
     .max(100, { message: "Company name is too long" }),
-  email: z.string().email({ message: "Invalid email address" }),
-  address: z
-    .string()
-    .min(3, { message: "Address is too short" })
-    .max(300, { message: "Address is too long" }),
-  phoneNumber: z
-    .string()
-    .min(3, { message: "Phone number is too short" })
-    .max(20, { message: "Phone number is too long" }),
+
   industry: z
     .string()
     .min(2, { message: "Industry is too short" })
@@ -63,9 +55,7 @@ export default function Onboarding01() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       companyName: "",
-      email: "",
-      address: "",
-      phoneNumber: "",
+
       industry: "",
       companyActivities: "",
     },
@@ -121,7 +111,6 @@ export default function Onboarding01() {
                   <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)}>
                       <div className="space-y-4">
-                        {/* Dynamically generated form fields */}
                         {Object.keys(formSchema.shape).map((fieldName) => (
                           <FormField
                             key={fieldName}

@@ -18,11 +18,11 @@ export async function POST(req: Request) {
         {
           role: "system",
           content:
-            "You are an AI trained to create action plans for a company based on journal entries. Analyze the key points in the journal entry and generate a practical action plan.",
+            "You are a skilled seo marketer. Provide some key words for the users company based on the description. ",
         },
         {
           role: "user",
-          content: prompt.prompt,
+          content: `Here is a description of my company:${prompt.prompt}`,
         },
       ],
       stream: true,

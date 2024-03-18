@@ -16,11 +16,9 @@ import OnboardingHeader from "../onboarding-header";
 
 import OnboardingProgress from "../onboarding-progress";
 
-
 import {
   Form,
   FormControl,
-
   FormField,
   FormItem,
   FormLabel,
@@ -44,12 +42,9 @@ const shareholderSchema = z.object({
     z.object({
       firstName: z.string().min(1, "Please enter the shareholder's first name"),
       lastName: z.string().min(1, "Please enter the shareholder's last name"),
-      dob: z.string().min(1, "Please enter the shareholder's date of birth"),
-      address: z.string().min(1, "Please enter the shareholder's address"),
+
       isDirector: z.string(),
-      phoneNumber: z
-        .string()
-        .min(1, "Please enter the shareholder's phone number"),
+
       email: z.string().email("Please enter a valid email address"),
       hourlyRate: z.coerce
         .number()
@@ -70,10 +65,9 @@ export default function Onboarding04() {
     shareholders: Array.from({ length: amount }, () => ({
       firstName: "",
       lastName: "",
-      dob: "",
-      address: "",
+
       isDirector: "shareholder",
-      phoneNumber: "",
+
       email: "",
       hourlyRate: 20,
     })),
@@ -93,17 +87,13 @@ export default function Onboarding04() {
         ({
           firstName,
           lastName,
-          dob,
-          address,
-          phoneNumber,
+
           email,
           hourlyRate,
         }) => ({
           firstName,
           lastName,
-          dob,
-          address,
-          phoneNumber,
+
           email,
           hourlyRate,
         }),
@@ -210,72 +200,6 @@ export default function Onboarding04() {
                         )}
                       />
                     </div>
-                    <FormField
-                      name={`shareholders.${index}.dob`}
-                      control={form.control}
-                      render={({ field, fieldState }) => (
-                        <FormItem>
-                          <FormLabel>Date of Birth</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              type="date"
-                              disabled={isLoading}
-                            />
-                          </FormControl>
-                          {fieldState.error && (
-                            <FormMessage>
-                              {fieldState.error.message}
-                            </FormMessage>
-                          )}
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      name={`shareholders.${index}.address`}
-                      control={form.control}
-                      render={({ field, fieldState }) => (
-                        <FormItem>
-                          <FormLabel>Address</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              {...field}
-                              placeholder="Enter address"
-                              disabled={isLoading}
-                            />
-                          </FormControl>
-                          {fieldState.error && (
-                            <FormMessage>
-                              {fieldState.error.message}
-                            </FormMessage>
-                          )}
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      name={`shareholders.${index}.phoneNumber`}
-                      control={form.control}
-                      render={({ field, fieldState }) => (
-                        <FormItem>
-                          <FormLabel>Phone Number</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              type="tel"
-                              placeholder="Enter phone number"
-                              disabled={isLoading}
-                            />
-                          </FormControl>
-                          {fieldState.error && (
-                            <FormMessage>
-                              {fieldState.error.message}
-                            </FormMessage>
-                          )}
-                        </FormItem>
-                      )}
-                    />
 
                     <FormField
                       name={`shareholders.${index}.email`}

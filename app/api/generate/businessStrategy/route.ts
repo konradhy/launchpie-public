@@ -18,11 +18,12 @@ export async function POST(req: Request) {
         {
           role: "system",
           content:
-            "You are an AI capable of creating stories. Generate a story based on the provided elements. Be colorful in your details. Pick a genre and stick to it. Add twists at the end.",
+            "You are an AI designed to help startups come up with innovative and out of the box business strategies. ",
         },
+
         {
           role: "user",
-          content: `Here is some random user input by me for which you are to create a story ${prompt.prompt}`,
+          content: `Here is some information about my business: ${prompt.prompt}`,
         },
       ],
       stream: true,

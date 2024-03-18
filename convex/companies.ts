@@ -5,9 +5,7 @@ import { Id } from "./_generated/dataModel";
 export const create = mutation({
   args: {
     companyName: v.string(),
-    email: v.string(),
-    address: v.string(),
-    phoneNumber: v.string(),
+
     industry: v.string(),
     companyActivities: v.string(),
   },
@@ -36,9 +34,9 @@ export const create = mutation({
 
     const company = await ctx.db.insert("companies", {
       companyName: args.companyName,
-      email: args.email,
-      address: args.address,
-      phoneNumber: args.phoneNumber,
+      email: "",
+      address: "",
+      phoneNumber: "",
       industry: args.industry,
       companyActivities: args.companyActivities,
       updatedAt: new Date().toISOString(),

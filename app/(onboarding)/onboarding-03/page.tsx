@@ -43,12 +43,11 @@ import { Switch } from "@/components/ui/switch";
 const shareholderSchema = z.object({
   firstName: z.string().min(1, "Please enter the shareholder's first name"),
   lastName: z.string().min(1, "Please enter the shareholder's last name"),
-  dob: z.string().min(1, "Please enter the shareholder's date of birth"),
-  address: z.string().min(1, "Please enter the shareholder's address"),
+
   isDirector: z.string(),
-  phoneNumber: z.string().min(1, "Please enter the shareholder's phone number"),
+
   email: z.string().email("Please enter a valid email address"),
-  amount: z.coerce.number().max(4, "Please enter a number between 0 and 4"),
+  amount: z.coerce.number().max(20, "Please enter a number between 0 and 20"),
   bind: z.boolean(),
   hourlyRate: z.coerce
     .number()
@@ -69,10 +68,9 @@ export default function Onboarding03() {
     defaultValues: {
       firstName: "",
       lastName: "",
-      dob: "",
-      address: "",
+
       isDirector: "shareholder",
-      phoneNumber: "",
+
       email: "",
       amount: 0,
       hourlyRate: 20,
@@ -163,61 +161,6 @@ export default function Onboarding03() {
                         )}
                       />
                     </div>
-
-                    <FormField
-                      name="dob"
-                      control={form.control}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Date of Birth</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              disabled={isLoading}
-                              type="date"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      name="address"
-                      control={form.control}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Address</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              {...field}
-                              disabled={isLoading}
-                              placeholder="Enter address"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      name="phoneNumber"
-                      control={form.control}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Phone Number</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              disabled={isLoading}
-                              placeholder="Enter shareholder's phone number"
-                              type="tel"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
 
                     <FormField
                       name="email"
@@ -352,7 +295,7 @@ export default function Onboarding03() {
                                 disabled={isLoading}
                                 type="number"
                                 min={0}
-                                max={4}
+                                max={20}
                               />
                             </FormControl>
                             <FormMessage />

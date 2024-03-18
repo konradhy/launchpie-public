@@ -1,11 +1,8 @@
 "use client";
 //fyi this is using old blocknote packages. Refactor for new
-//The similar to the other files, the files here are just being uploaded to the server. Meaning anyone can access it.
-
-
 
 import { useCompletion } from "ai/react";
-import { BrainCircuit, Languages, Minimize2, Wand } from "lucide-react";
+import { BrainCircuit, Wand, Briefcase } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { BlockNoteEditor, PartialBlock } from "@blocknote/core";
@@ -69,9 +66,9 @@ const Editor = ({
   };
 
   //AI Hooks
-  const { complete: completeLanguage, completion: completionLanguage } =
+  const { complete: completeBusiness, completion: completionBusiness } =
     useCompletion({
-      api: "/api/generate/language",
+      api: "/api/generate/businessStrategy",
     });
 
   const { complete: completeActionPlan, completion: completionActionPlan } =
@@ -79,10 +76,9 @@ const Editor = ({
       api: "/api/generate/actionplan",
     });
 
-  const { complete: completeStory, completion: completionStory } =
-    useCompletion({
-      api: "/api/generate/storymaker",
-    });
+  const { complete: completeSeo, completion: completionSeo } = useCompletion({
+    api: "/api/generate/seoMaker",
+  });
 
   /*
     it has to be an http route
@@ -90,8 +86,8 @@ const Editor = ({
     */
 
   //AI Blocks
-  //translate block
-  const translateBlock = async () => {
+
+  const businessBlock = async () => {
     let block = editor.getTextCursorPosition().block;
     if (!block || !block.content || block.content.length === 0) {
       return;
@@ -100,18 +96,18 @@ const Editor = ({
     block.content.forEach((contentItem) => {
       if ("text" in contentItem) {
         let aiPrompt = contentItem.text;
-        completeLanguage(aiPrompt);
+        completeBusiness(aiPrompt);
       }
     });
   };
 
-  const insertTranslateBlock: ReactSlashMenuItem = {
-    name: "Translate Tailor",
-    execute: translateBlock,
+  const insertBusinessBlock: ReactSlashMenuItem = {
+    name: "Business Strategist",
+    execute: businessBlock,
     aliases: ["tt", "ai"],
     group: "Ai Tools",
-    icon: <Languages size={18} />,
-    hint: "Type your message and end with the target language",
+    icon: <Briefcase size={18} />,
+    hint: "Provide some information about your business and get a business strategy.",
   };
 
   //actionplan block
@@ -131,16 +127,16 @@ const Editor = ({
   };
 
   const insertActionPlanBlock: ReactSlashMenuItem = {
-    name: "Action Angel",
+    name: "Action Plan ",
     execute: actionPlanBlock,
     aliases: ["aa", "an"],
     group: "Ai Tools",
     icon: <Wand size={18} />,
-    hint: "Type your text and get a concise, key-point summary.",
+    hint: "Creates an action plan for a company objective.",
   };
 
   //StoryMaker  block
-  const storyBlock = async () => {
+  const seoBlock = async () => {
     let block = editor.getTextCursorPosition().block;
     if (!block || !block.content || block.content.length === 0) {
       return;
@@ -149,25 +145,25 @@ const Editor = ({
     block.content.forEach((contentItem) => {
       if ("text" in contentItem) {
         let aiPrompt = contentItem.text;
-        completeStory(aiPrompt);
+        completeSeo(aiPrompt);
       }
     });
   };
 
-  const insertThoughtBlock: ReactSlashMenuItem = {
-    name: "Tale Spinner",
-    execute: storyBlock,
+  const insertSeoBlock: ReactSlashMenuItem = {
+    name: "SEO Bot",
+    execute: seoBlock,
     aliases: ["ts", "sp"],
     group: "Ai Tools",
     icon: <BrainCircuit size={18} />,
-    hint: "Type some words and Tale Spinner will generate a story for you!",
+    hint: "Describe your company and get a list of keywords that will help you rank higher in search engines.",
   };
 
   const customSlashMenuItemList = [
     ...getDefaultReactSlashMenuItems(),
-    insertTranslateBlock,
+    insertBusinessBlock,
     insertActionPlanBlock,
-    insertThoughtBlock,
+    insertSeoBlock,
   ];
 
   const editor: BlockNoteEditor = useBlockNote({
@@ -182,15 +178,14 @@ const Editor = ({
     slashMenuItems: customSlashMenuItemList,
   });
 
-  //AI Config for translate
   const previousLanguageCompletion = useRef("");
   const tokenLanguage = useMemo(() => {
-    if (!completionLanguage) return;
-    const diff = completionLanguage.slice(
+    if (!completionBusiness) return;
+    const diff = completionBusiness.slice(
       previousLanguageCompletion.current.length,
     );
     return diff;
-  }, [completionLanguage]);
+  }, [completionBusiness]);
 
   useEffect(() => {
     if (!tokenLanguage) return;
@@ -199,9 +194,9 @@ const Editor = ({
     if (!block) return;
 
     editor.updateBlock(block, {
-      content: completionLanguage,
+      content: completionBusiness,
     });
-  }, [completionLanguage, tokenLanguage, editor]);
+  }, [completionBusiness, tokenLanguage, editor]);
 
   //AI Config for ActionPlan
 
@@ -228,10 +223,10 @@ const Editor = ({
   //Ai config for story maker
   const previousStoryCompletion = useRef("");
   const tokenStory = useMemo(() => {
-    if (!completionStory) return;
-    const diff = completionStory.slice(previousStoryCompletion.current.length);
+    if (!completionSeo) return;
+    const diff = completionSeo.slice(previousStoryCompletion.current.length);
     return diff;
-  }, [completionStory]);
+  }, [completionSeo]);
 
   useEffect(() => {
     if (!tokenStory) return;
@@ -240,9 +235,9 @@ const Editor = ({
     if (!block) return;
 
     editor.updateBlock(block, {
-      content: completionStory,
+      content: completionSeo,
     });
-  }, [completionStory, tokenStory, editor]);
+  }, [completionSeo, tokenStory, editor]);
 
   //Live content
 
