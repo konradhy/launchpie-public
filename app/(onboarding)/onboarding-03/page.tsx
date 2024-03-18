@@ -82,8 +82,9 @@ export default function Onboarding03() {
 
   const onSubmit = async (data: z.infer<typeof shareholderSchema>) => {
     try {
-      let { isDirector, amount, ...rest } = data;
-      const personId = await create({ ...rest, companyId });
+      let { isDirector, amount, bind, ...rest } = data;
+      bind = true;
+      const personId = await create({ ...rest, companyId, bind });
 
       //I just added await and didn't test it
       await update({ companyId, personId, type: isDirector });
