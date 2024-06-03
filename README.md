@@ -2,7 +2,6 @@
 
 LaunchPie is a platform for startups that allows you to divide equity based on contributions, ensuring clear and fair distribution tied to what each person actually does.
 
-A video demo
 
 ## Overview
 
